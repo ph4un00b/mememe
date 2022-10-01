@@ -2,8 +2,9 @@ import { setState } from '@/helpers/store'
 import { useEffect, useRef } from 'react'
 
 const Dom = ({ children }) => {
-  const ref = useRef(null)
+  const ref = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
+    /** @ts-ignore todo: why?? */
     setState({ dom: ref })
   }, [])
 

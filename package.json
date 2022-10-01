@@ -1,9 +1,6 @@
 {
-  "name": "react-three-next",
+  "name": "mememe",
   "version": "2.0.0",
-  "authors": [
-    "Renaud ROHLINGER <https://twitter.com/onirenaud>"
-  ],
   "license": "MIT",
   "private": true,
   "engines": {
@@ -41,7 +38,7 @@
     "url-loader": "^4.1.1"
   },
   "scripts": {
-    "lint": "yarn prettier && yarn eslint",
+    "lint": "prettier && eslint",
     "eslint": "next lint --fix --dir src",
     "prettier": "prettier --list-different \"./src/**/*.{ts,tsx,md}\"",
     "dev": "next dev",
