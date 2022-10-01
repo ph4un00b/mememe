@@ -1,10 +1,10 @@
 import Head from 'next/head'
 
-const titleDefault = 'React Three Next Starter'
-const url = 'https://react-three-next.vercel.app/'
+const titleDefault = ' ⛺ my haus in mars!'
+const url = 'https://3me.vercel.app/'
 const description =
-  'The easiest and fastest way to create a 3D website using React Three Fiber and NextJS'
-const author = 'Author'
+  'enjoy!'
+const author = 'ph4un00b'
 
 const Header = ({ title = titleDefault }) => {
   return (
@@ -23,7 +23,7 @@ const Header = ({ title = titleDefault }) => {
         <meta name='description' content={description} />
         <meta
           name='keywords'
-          content='Software Engineer,Product Manager,Project Manager,Data Scientist,Computer Scientist'
+          content='Software Engineer, Creative Development, React Three Fiber, Threejs, GLSL, Shaders, Typescript'
         />
         <meta name='robots' content='index,follow' />
         <meta name='distribution' content='web' />
@@ -75,8 +75,8 @@ const Header = ({ title = titleDefault }) => {
       Twitter Summary card
         documentation: https://dev.twitter.com/cards/getting-started
         Be sure validate your Twitter card markup on the documentation site. */}
-        <meta name='twitter:card' content='summary' />
-        <meta name='twitter:site' content='@onirenaud' />
+        <meta name='twitter:card' content='hello your are welcome to visit my virtual flat.' />
+        <meta name='twitter:site' content={url} />
       </Head>
     </>
   )
