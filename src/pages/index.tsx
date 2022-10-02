@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic'
 // Step 5 - delete Instructions components
 import Instructions from '@/components/dom/Instructions'
 import { Fondo } from '@/components/pages/Home/Fondo'
+import { Center, Text3D } from '@react-three/drei'
 // import Shader from '@/components/canvas/Shader/Shader'
 
 // Dynamic import is used to prevent a payload when the website start that will include threejs r3f etc..
@@ -29,16 +30,42 @@ const Shader = dynamic(() => import('@/components/canvas/Shader/Shader'), {
 const Page = (props) => {
   return (
     <>
-      <Instructions />
+      {/* <Instructions /> */}
     </>
   )
+}
+
+let baseUrl = 'https://ph4un00b.github.io/data'
+
+let global = {
+  font1: `${baseUrl}/typeface/press-start-2p.json`,
 }
 
 // canvas components goes here
 // It will receive same props as Page component (from getStaticProps, etc.)
 Page.r3f = (props) => (
   <>
-    <Shader />
+    <group position={[0, 0, 0]}>
+      <Center>
+        <Text3D position={[0, 4, 0]} castShadow={!true} font={global.font1}>
+          p
+          <meshStandardMaterial metalness={0} roughness={0} />
+        </Text3D>
+        <Text3D position={[0, 2, 0]} castShadow={!true} font={global.font1}>
+          h
+          <meshStandardMaterial metalness={0} roughness={0} />
+        </Text3D>
+        <Text3D position={[0, 0.5, 0]} castShadow={!true} font={global.font1}>
+          a
+          <meshStandardMaterial metalness={0} roughness={0} />
+        </Text3D>
+        <Text3D position={[0, -1, 0]} castShadow={!true} font={global.font1}>
+          u
+          <meshStandardMaterial metalness={0} roughness={0} />
+        </Text3D>
+      </Center>
+    </group>
+    {/* <Shader /> */}
     <Fondo />
   </>
 )
