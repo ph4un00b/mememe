@@ -172,10 +172,11 @@ declare module '@react-three/fiber' {
 
 export default Page
 
-export async function getStaticProps() {
-  return {
-    props: {
-      title: 'Index',
-    },
-  }
-}
+/** not ssr needed */
+// export async function getStaticProps() {
+//   return {
+//     props: {
+//       title: 'Index',
+//     },
+//   }
+// }
