@@ -55,6 +55,11 @@ function Letra({ symbol, ...props }: { symbol: string } & F.MeshProps) {
                 setActive(false)
             }}
 
+            onClick={(e) => {
+                e.stopPropagation()
+                setActive(true)
+            }}
+
             onPointerOver={(e) => {
                 e.stopPropagation()
                 setActive(true)
