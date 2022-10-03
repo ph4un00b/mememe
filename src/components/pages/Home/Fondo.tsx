@@ -23,9 +23,7 @@ export function Fondo() {
     )
 }
 
-type ShaderProps = T.ShaderMaterial & {
-    [key: string]: any
-}
+
 
 /** identity for template-literal */
 const glsl = (x: TemplateStringsArray) => String(x)
@@ -119,11 +117,16 @@ const frag = glsl`
   }
 `
 
-let AguaMat = D.shaderMaterial({ utime: 0 }, vertex, frag)
-F.extend({ AguaMat }) // -> now you can do <aguaMat ... />
+type ShaderProps = T.ShaderMaterial & {
+    [key: string]: any
+}
+
 declare module '@react-three/fiber' {
     interface ThreeElements {
-        /** @ts-ignore */
-        aguaMat: F.MaterialNode<AguaMat, typeof AguaMat>
+        aguaMat: F.Object3DNode<ShaderProps, typeof AguaMat>
     }
 }
+
+const AguaMat = D.shaderMaterial({ utime: 0 }, vertex, frag)
+
+F.extend({ AguaMat }) // -> now you can do <aguaMat ... />
