@@ -23,8 +23,6 @@ export function Fondo() {
     )
 }
 
-
-
 /** identity for template-literal */
 const glsl = (x: TemplateStringsArray) => String(x)
 
