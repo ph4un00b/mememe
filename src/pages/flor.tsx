@@ -4,6 +4,7 @@ import FlorScene from '@/components/pages/Flor/FlorScene'
 import * as meta from '@/config'
 import { PerspectiveCamera } from '@react-three/drei'
 import * as X from 'next-axiom'
+import { Leva } from 'leva'
 
 const Box = dynamic(() => import('@/components/canvas/Box'), {
     ssr: false,
@@ -15,6 +16,7 @@ const Page = (props) => {
     return (
         <>
             {/* <Instructions /> */}
+            <Leva collapsed={true} />
         </>
     )
 }
@@ -31,7 +33,6 @@ Page.r3f = (props) => (
         />
 
         <FlorScene />
-
         {/* <axesHelper args={[8]} /> */}
     </>
 )
