@@ -1,6 +1,6 @@
 import Instructions from '@/components/dom/Instructions'
 import dynamic from 'next/dynamic'
-import Flor from '@/components/pages/Flor/Flor'
+import FlorScene from '@/components/pages/Flor/FlorScene'
 import * as meta from '@/config'
 import { PerspectiveCamera } from '@react-three/drei'
 import * as X from 'next-axiom'
@@ -29,9 +29,9 @@ Page.r3f = (props) => (
             manual={false}
             makeDefault={true}
         />
-        <group>
-            <Flor />
-        </group>
+
+        <FlorScene />
+
         {/* <axesHelper args={[8]} /> */}
     </>
 )

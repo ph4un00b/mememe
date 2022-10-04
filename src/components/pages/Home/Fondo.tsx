@@ -1,7 +1,7 @@
-import * as T from 'three'
-import * as D from '@react-three/drei'
-import * as F from '@react-three/fiber'
 import * as R from 'react'
+import * as T from 'three'
+import * as F from '@react-three/fiber'
+import * as D from '@react-three/drei'
 
 export function Fondo() {
     const shader = R.useRef<ShaderProps>(null)

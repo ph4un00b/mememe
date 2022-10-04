@@ -5,7 +5,7 @@ import * as F from '@react-three/fiber'
 import * as D from '@react-three/drei'
 import { useColoritos } from '@/utils/coloritos'
 
-export default function Flor() {
+export default function FlorScene() {
     const geo = R.useRef<T.BufferGeometry>(null!)
     const points = R.useRef<T.Points>(null!)
 
@@ -69,7 +69,7 @@ void main()
     modelPosition.z = sin(angle) * distanceToCenter;
 
     // Randomness
-    modelPosition.xyz += aRandomness;
+    // modelPosition.xyz += aRandomness;
 
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;

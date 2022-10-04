@@ -45,7 +45,7 @@
     "lint": "prettier && eslint",
     "eslint": "next lint --fix --dir src",
     "prettier": "prettier --list-different \"./src/**/*.{ts,tsx,md}\"",
-    "dev": "next dev",
+    "dev": "next dev -- -H 0.0.0.0",
     "build": "next build",
     "export": "EXPORT=true next build && EXPORT=true next export",
     "analyze": "ANALYZE=true next build",
