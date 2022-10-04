@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic'
 import Flor from '@/components/pages/Flor/Flor'
 import * as meta from '@/config'
 import { PerspectiveCamera } from '@react-three/drei'
+import * as X from 'next-axiom'
 
 const Box = dynamic(() => import('@/components/canvas/Box'), {
     ssr: false,
@@ -10,6 +11,7 @@ const Box = dynamic(() => import('@/components/canvas/Box'), {
 
 // Step 5 - delete Instructions components
 const Page = (props) => {
+    X.log.debug('🌷', { sopa: 'hola', customerId: 32423, auth: 'session' })
     return (
         <>
             {/* <Instructions /> */}

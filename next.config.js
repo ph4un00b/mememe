@@ -1,3 +1,5 @@
+const { withAxiom } = require("next-axiom");
+
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
@@ -76,5 +78,5 @@ module.exports = (_phase, { defaultConfig }) => {
     }
   });
 
-  return finalConfig;
+  return withAxiom(finalConfig);
 };

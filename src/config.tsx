@@ -1,9 +1,9 @@
 import Head from 'next/head'
 
-export const titleDefault = '🍄🌶⛺ my haus 2022!'
+export const titleDefault = '🍄 trip haus 2022!'
 const url = 'https://3me.vercel.app/'
 const description =
-  '(☞ﾟヮﾟ)☞ enjoy my universe ☜(ﾟヮﾟ☜)'
+  'enjoy my universe ☜(ﾟヮﾟ☜)'
 const author = 'fau'
 
 const Header = ({ title = titleDefault }) => {

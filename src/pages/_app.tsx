@@ -19,4 +19,5 @@ function App({ Component, pageProps = { title: 'index' } }) {
   )
 }
 
+export { reportWebVitals } from 'next-axiom'
 export default App
