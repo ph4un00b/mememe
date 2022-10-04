@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 // import Instructions from '@/components/dom/Instructions'
 import { Fondo } from '@/components/pages/Home/Fondo'
 import { Phau } from '@/components/pages/Home/Phau'
+import * as meta from '@/config'
 // import Shader from '@/components/canvas/Shader/Shader'
 
 // Dynamic import is used to prevent a payload when the website start that will include threejs r3f etc..
@@ -55,11 +56,10 @@ Page.r3f = (props) => (
 
 export default Page
 
-/** not ssr needed */
-// export async function getStaticProps() {
-//   return {
-//     props: {
-//       title: 'Index',
-//     },
-//   }
-// }
+export async function getStaticProps() {
+  return {
+    props: {
+      title: `🐋💨 - ${meta.titleDefault}`
+    },
+  }
+}
