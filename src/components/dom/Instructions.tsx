@@ -91,7 +91,7 @@ export function FlorTop() {
         <br />
         <span className='text-sm '>
           with 💖{' '}
-          <span className='text-blue-200'>#WebGL #Typescript #3RF #React</span>{' '}
+          <span className='text-blue-200'>#WebGL #Typescript #R3F #React</span>{' '}
           <br />
           <span className='text-blue-200'>#Next #Math #Human #Time</span>
         </span>
