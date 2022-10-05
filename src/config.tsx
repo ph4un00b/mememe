@@ -1,10 +1,10 @@
 import Head from 'next/head'
 
-export const titleDefault = '🍄 trip haus 2022!'
+export const titleDefault = '2022 trip haus 🍄!'
 const url = 'https://3me.vercel.app/'
 const description =
   'enjoy my universe ☜(ﾟヮﾟ☜)'
-const author = 'fau'
+const author = 'phau'
 
 const Header = ({ title = titleDefault }) => {
   return (

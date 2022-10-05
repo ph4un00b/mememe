@@ -68,8 +68,7 @@ void main()
     modelPosition.x = cos(angle) * distanceToCenter;
     modelPosition.z = sin(angle) * distanceToCenter;
 
-    // Randomness
-    // modelPosition.xyz += aRandomness;
+    // tu mamá en tanga ╰(*°▽°*)╯!!!
 
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;
@@ -259,6 +258,11 @@ void main() {
     )
 }
 
+
+
+function glslUniforms() {
+    return `
+
 /**
  *    - functions are typed as well
  *    - float sum(float a, float b) { return a + b; };
@@ -281,8 +285,6 @@ void main() {
  *   - https://www.youtube.com/channel/UC8Wzk_R1GoPkPqLo-obU_kQ
  */
 
-function glslUniforms() {
-    return `
 uniform float uTime;
 uniform float uSize;
 

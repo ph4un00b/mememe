@@ -5,18 +5,34 @@ import { PerspectiveCamera } from '@react-three/drei'
 import * as X from 'next-axiom'
 import { Leva } from 'leva'
 import { FlorTop, Instructions } from '@/components/dom/Instructions'
+import * as hooks from '@/utils/hooks'
+import * as R from 'react'
+import * as browser from '@/utils/browser'
 
-const Box = dynamic(() => import('@/components/canvas/Box'), {
-    ssr: false,
-})
+// const Box = dynamic(() => import('@/components/canvas/Box'), {
+//     ssr: false,
+// })
 
-// Step 5 - delete Instructions components
 const Page = (props) => {
+    const [collapsed, setCollapsed] = R.useState(true)
     X.log.debug('🌸', { sopa: 'init' })
+
+    hooks.useTimeout(() => {
+        if (browser.isMobile()) X.log.debug('📲', { sopa: 'mobile' })
+        if (browser.isMobile()) return
+        setCollapsed(!true)
+    }, 3210)
+
     return (
         <>
             {/* <FlorTop /> */}
-            <Leva collapsed={true} hidden={!true} />
+            <Leva
+                collapsed={{
+                    collapsed,
+                    onChange(c) { },
+                }}
+                hidden={!true}
+            />
         </>
     )
 }
@@ -42,7 +58,7 @@ export default Page
 export async function getStaticProps() {
     return {
         props: {
-            title: `🌺Florecer GLSL- ${meta.titleDefault}`,
+            title: `Florecer 🌺 GLSL - ${meta.titleDefault}`,
         },
     }
 }
