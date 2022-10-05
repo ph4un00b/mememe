@@ -1,4 +1,5 @@
 import * as X from 'next-axiom'
+import * as N from 'next/router'
 import * as R from 'react'
 
 export function Instructions() {
@@ -35,6 +36,7 @@ export function Instructions() {
 }
 
 export function FlorTop() {
+  const router = N.useRouter()
   const dom = R.useRef<HTMLDivElement | null>(null)
   return (
     <div ref={dom}
@@ -97,8 +99,8 @@ export function FlorTop() {
         <br />
         <button
           onClick={() => {
-            X.log.debug('🍄', { sopa: 'flor' })
-            dom.current.remove()
+            router.push('/florecer')
+            // window.location = '/florecer'
           }}
           className='cyberpunk'>Press Start</button>
       </div>
