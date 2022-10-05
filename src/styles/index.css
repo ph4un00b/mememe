@@ -25,10 +25,10 @@ button.cyberpunk {
   text-transform: uppercase;
   font-weight: bold;
   letter-spacing: 0.05em;
-  background-color: #e47272;
+  background-color: rgb(99, 167, 251);
   border: none;
   outline: none;  
-  box-shadow: 4px -2px 0px 0px #bbf7d0;
+  box-shadow: 4px -2px 0px 0px #ebebeb;
   transition: 0.3s ease;
   cursor: pointer;
 }

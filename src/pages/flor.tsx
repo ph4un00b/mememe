@@ -13,7 +13,7 @@ const Box = dynamic(() => import('@/components/canvas/Box'), {
 
 // Step 5 - delete Instructions components
 const Page = (props) => {
-    X.log.debug('🌷', { sopa: 'hola', customerId: 32423, auth: 'session' })
+    X.log.debug('🌷', { sopa: 'hola' })
     return (
         <>
             <FlorTop />

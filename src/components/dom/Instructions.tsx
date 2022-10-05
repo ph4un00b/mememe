@@ -1,3 +1,6 @@
+import * as X from 'next-axiom'
+import * as R from 'react'
+
 export function Instructions() {
   return (
     <div
@@ -32,8 +35,9 @@ export function Instructions() {
 }
 
 export function FlorTop() {
+  const dom = R.useRef<HTMLDivElement | null>(null)
   return (
-    <div
+    <div ref={dom}
       // classname='pointer-events-none'
       // eslint-disable-next-line tailwind/class-order
       className='absolute max-w-lg px-4 py-2 text-sm transform -translate-x-1/2 bg-gray-900 shadow-xl select-none md:text-base top-8 left-1/2 text-gray-50'
@@ -47,33 +51,56 @@ export function FlorTop() {
         <br />
         <br />
         job contact / freelance
-
         <br />
         <br />
-        <a href="https://t.me/phaunus" target='_blank' rel="noreferrer">
-          <span className='text-green-200 underline '>https://t.me/phaunus</span>
+        <a
+          href='/api/links/text'
+          target='_blank'
+          rel='noreferrer'
+        >
+          <span
+            className='text-green-200 underline '>
+            https://t.me/phaunus
+          </span>
         </a>
         <br />
-
         <br />
-        <a href="https://calendly.com/phaunus" target='_blank' rel="noreferrer">
-          <span className='text-green-200 underline '>https://calendly.com/phaunus</span>
+        <a
+          href='/api/links/call' target='_blank' rel='noreferrer'>
+          <span className='text-green-200 underline '>
+            https://calendly.com/phaunus
+          </span>
         </a>
         <br />
-
         <br />
-        <a href="mailto:phaunus[ at ]protonmail[ dot ]com" target='_blank' rel="noreferrer">
-          <span className='text-green-200 underline '>Email [fill placeholders] 😁</span>
+        <a
+          onClick={() => {
+            X.log.debug('💌', { sopa: 'correo' })
+          }}
+          href='mailto:phaunus[ at ]protonmail[ dot ]com'
+          target='_blank'
+          rel='noreferrer'
+        >
+          <span className='text-green-200 underline '>
+            Email [fill placeholders] 😁
+          </span>
         </a>
         <br />
-
         <br />
-        <span className="">
-          with 💖 #WebGL #Typescript #3RF #React #Next
+        <span className='text-sm '>
+          with 💖{' '}
+          <span className='text-blue-200'>#WebGL #Typescript #3RF #React</span>{' '}
+          <br />
+          <span className='text-blue-200'>#Next #Math #Human #Time</span>
         </span>
         <br />
         <br />
-        <button className="cyberpunk">Press Start</button>
+        <button
+          onClick={() => {
+            X.log.debug('🍄', { sopa: 'flor' })
+            dom.current.remove()
+          }}
+          className='cyberpunk'>Press Start</button>
       </div>
     </div>
   )
