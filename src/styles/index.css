@@ -6,7 +6,7 @@
   * {
     box-sizing: border-box;
   }
-  
+
   html,
   body,
   #__next {
@@ -16,4 +16,25 @@
     padding: 0;
     overflow: hidden;
   }
+}
+
+button.cyberpunk {
+  width: 140px;
+  height: 40px;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  background-color: #e47272;
+  border: none;
+  outline: none;  
+  box-shadow: 4px -2px 0px 0px #bbf7d0;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+button.cyberpunk:hover {
+  box-shadow: none;
+  background-color: transparent;
+  color: white;
 }

@@ -1,10 +1,11 @@
-import Instructions from '@/components/dom/Instructions'
+
 import dynamic from 'next/dynamic'
 import FlorScene from '@/components/pages/Flor/FlorScene'
 import * as meta from '@/config'
 import { PerspectiveCamera } from '@react-three/drei'
 import * as X from 'next-axiom'
 import { Leva } from 'leva'
+import { FlorTop, Instructions } from '@/components/dom/Instructions'
 
 const Box = dynamic(() => import('@/components/canvas/Box'), {
     ssr: false,
@@ -15,8 +16,8 @@ const Page = (props) => {
     X.log.debug('🌷', { sopa: 'hola', customerId: 32423, auth: 'session' })
     return (
         <>
-            {/* <Instructions /> */}
-            <Leva collapsed={true} />
+            <FlorTop />
+            <Leva collapsed={true} hidden={true} />
         </>
     )
 }
