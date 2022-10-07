@@ -262,12 +262,12 @@ void main() {
 
         let currentBeatDuration = data.beats[0].start + data.beats[0].duration
         let beatDelta = data.beats[0].duration / 5 /** can be whatever */
-        // console.log({ start: data.beats[0].start, delta: beatDelta, next: data.beats[0].start + data.beats[0].duration })
-        // console.log(position)
+
 
         if (!inEffect.current) {
             if (position > data.beats[0].start && position < currentBeatDuration) {
                 log('beat', styles[beat % 3])
+                // console.log({ start: data.beats[0].start, delta: beatDelta, next: data.beats[0].start + data.beats[0].duration })
                 inEffect.current = true
                 beat++
             }
@@ -280,6 +280,78 @@ void main() {
             }
         }
     })
+
+    // F.useFrame((state) => {
+    //     if (!(position > 0) /** started */) return
+
+    //     let currentBeatDuration = data.bars[0].start + data.bars[0].duration
+    //     let beatDelta = data.bars[0].duration / 5 /** can be whatever */
+    //     // console.log({ start: data.beats[0].start, delta: beatDelta, next: data.beats[0].start + data.beats[0].duration })
+    //     // console.log(position)
+
+    //     if (!inEffect.current) {
+    //         if (position > data.bars[0].start && position < currentBeatDuration) {
+    //             log('bars', styles[beat % 3])
+    //             inEffect.current = true
+    //             beat++
+    //         }
+    //     }
+
+    //     if (inEffect.current) {
+    //         if (position > currentBeatDuration - 2 * beatDelta) {
+    //             inEffect.current = false
+    //             data.bars.splice(0, 1)
+    //         }
+    //     }
+    // })
+
+    // F.useFrame((state) => {
+    //     if (!(position > 0) /** started */) return
+
+    //     let currentBeatDuration = data.sections[0].start + data.sections[0].duration
+    //     let beatDelta = data.sections[0].duration / 5 /** can be whatever */
+    //     // console.log(position)
+
+    //     if (!inEffect.current) {
+    //         if (position > data.sections[0].start && position < currentBeatDuration) {
+    //             log('sections', styles[beat % 3])
+    //             console.log({ start: data.sections[0].start, next: data.sections[0].start + data.sections[0].duration })
+    //             inEffect.current = true
+    //             beat++
+    //         }
+    //     }
+
+    //     if (inEffect.current) {
+    //         if (position > currentBeatDuration - 2 * beatDelta) {
+    //             inEffect.current = false
+    //             data.sections.splice(0, 1)
+    //         }
+    //     }
+    // })
+
+    // F.useFrame((state) => {
+    //     if (!(position > 0) /** started */) return
+
+    //     let currentBeatDuration = data.tatums[0].start + data.tatums[0].duration
+    //     let beatDelta = data.tatums[0].duration / 5 /** can be whatever */
+    //     // console.log(position)
+
+    //     if (!inEffect.current) {
+    //         if (position > data.tatums[0].start && position < currentBeatDuration) {
+    //             log('tatums', styles[beat % 3])
+    //             console.log({ start: data.tatums[0].start, next: data.tatums[0].start + data.sections[0].duration })
+    //             inEffect.current = true
+    //             beat++
+    //         }
+    //     }
+
+    //     if (inEffect.current) {
+    //         if (position > currentBeatDuration - 2 * beatDelta) {
+    //             inEffect.current = false
+    //             data.tatums.splice(0, 1)
+    //         }
+    //     }
+    // })
 
     return (
         <points
