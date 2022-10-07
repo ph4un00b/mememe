@@ -9,21 +9,44 @@ import { useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../../../music/florecer.json'
 let data = florecerData as MusicAnalysis
 
+const Style = {
+    base: [
+        'color: #fff',
+        'background-color: #444',
+        'padding: 2px 4px',
+        'border-radius: 2px',
+    ],
+    warning: ['color: #eee', 'background-color: red'],
+    success: ['background-color: green'],
+}
+
+const styles = [Style.base, Style.warning, Style.success]
+let beat = 0
+
+const log = (text, extra = []) => {
+    let style = Style.base.join(';') + ';'
+    style += extra.join(';') // Add any additional styles
+    console.log(`%c${text}`, style)
+}
+
 export default function FlorScene() {
     const geo = R.useRef<T.BufferGeometry>(null!)
     const points = R.useRef<T.Points>(null!)
 
-    const {
-        leverA,
-        offset,
-        leverC,
-        particles,
-        leverCrazy,
-        leverD,
-        leverE,
-        leverR,
-        leverR2,
-    } = L.useControls({
+    const [
+        {
+            leverA,
+            offset,
+            leverC,
+            particles,
+            leverCrazy,
+            leverD,
+            leverE,
+            leverR,
+            leverR2,
+        },
+        Lset,
+    ] = L.useControls(() => ({
         leverA: { value: 0.65, min: 0, max: 2, step: 0.01 },
         offset: { value: 0.0, min: 0, max: 1, step: 0.01 },
         leverC: { value: 1, min: 1, max: 20, step: 1 },
@@ -32,8 +55,13 @@ export default function FlorScene() {
         leverCrazy: { value: 0.45, min: 0.01, max: 2, step: 0.01 },
         leverR: { value: 2.0, min: 0, max: 2, step: 0.001 },
         leverR2: { value: 10, min: 1, max: 10, strep: 0.001 },
-        particles: { value: 45_000, min: 100, max: 100_000, step: 1_000 },
-    })
+        particles: {
+            value: 45_000,
+            min: 0,
+            max: 100_000,
+            step: 1_000,
+        },
+    }))
 
     const { gl, viewport, size } = F.useThree()
     /** @link https://github.com/pmndrs/react-three-fiber/discussions/1012 */
@@ -228,20 +256,29 @@ void main() {
         highRefreshRate: true,
     })
 
-    const effect = R.useRef(false)
+    const inEffect = R.useRef(false)
     F.useFrame((state) => {
         if (!(position > 0) /** started */) return
 
-        // console.log(data.beats)
-        if (!effect.current && (data.beats[0].start + data.beats[0].duration > position)) {
-            effect.current = true
-            // console.log('beaT!', data.beats[0].start)
-            // console.log({ position, next: data.beats[0].start + data.beats[0].duration })
-        } else {
-            effect.current = false
-            data.beats.splice(0, 1);
+        let currentBeatDuration = data.beats[0].start + data.beats[0].duration
+        let beatDelta = data.beats[0].duration / 5 /** can be whatever */
+        // console.log({ start: data.beats[0].start, delta: beatDelta, next: data.beats[0].start + data.beats[0].duration })
+        // console.log(position)
+
+        if (!inEffect.current) {
+            if (position > data.beats[0].start && position < currentBeatDuration) {
+                log('beat', styles[beat % 3])
+                inEffect.current = true
+                beat++
+            }
         }
 
+        if (inEffect.current) {
+            if (position > currentBeatDuration - 2 * beatDelta) {
+                inEffect.current = false
+                data.beats.splice(0, 1)
+            }
+        }
     })
 
     return (
