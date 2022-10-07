@@ -60,6 +60,10 @@ export default function FlorScene() {
             min: 0,
             max: 100_000,
             step: 1_000,
+            // onChange: (v) => {
+            //     // imperatively update the world after Leva input changes
+            //     console.log(v)
+            // },
         },
     }))
 
@@ -263,19 +267,22 @@ void main() {
         let currentBeatDuration = data.beats[0].start + data.beats[0].duration
         let beatDelta = data.beats[0].duration / 5 /** can be whatever */
 
-
         if (!inEffect.current) {
             if (position > data.beats[0].start && position < currentBeatDuration) {
                 log('beat', styles[beat % 3])
                 // console.log({ start: data.beats[0].start, delta: beatDelta, next: data.beats[0].start + data.beats[0].duration })
                 inEffect.current = true
                 beat++
+                Lset({ particles: 1 * 45_000 /** inital particles */ })
+                Lset({ leverCrazy: 2 * 0.45 + Math.random() /** inital particles */ })
             }
         }
 
         if (inEffect.current) {
             if (position > currentBeatDuration - 2 * beatDelta) {
                 inEffect.current = false
+                Lset({ particles: 0.15 * 45_000 })
+                Lset({ leverCrazy: 0.15 * 0.45 + (Math.random() * 0.3) /** inital particles */ })
                 data.beats.splice(0, 1)
             }
         }

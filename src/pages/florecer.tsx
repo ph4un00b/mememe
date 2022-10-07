@@ -58,7 +58,7 @@ function Page(props) {
                     collapsed,
                     onChange(c) { },
                 }}
-                hidden={!true}
+                hidden={true}
             />
         </>
     )
