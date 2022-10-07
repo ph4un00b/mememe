@@ -17,6 +17,7 @@
     "next-pwa": "^5.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-use-audio-player": "^1.2.6",
     "three": "^0.144.0",
     "three-stdlib": "^2.15.0",
     "zustand": "^4.1.1"
@@ -45,7 +46,8 @@
     "lint": "prettier && eslint",
     "eslint": "next lint --fix --dir src",
     "prettier": "prettier --list-different \"./src/**/*.{ts,tsx,md}\"",
-    "dev": "next dev -- -H 0.0.0.0",
+    "wdev": "next dev -- -H 0.0.0.0",
+    "dev": "next dev",
     "build": "next build",
     "export": "EXPORT=true next build && EXPORT=true next export",
     "analyze": "ANALYZE=true next build",
