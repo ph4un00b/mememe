@@ -4,7 +4,7 @@ import * as meta from '@/config'
 import { PerspectiveCamera } from '@react-three/drei'
 import * as X from 'next-axiom'
 import { Leva } from 'leva'
-import { FlorTop, Instructions } from '@/components/dom/Instructions'
+import { FlorTop, Instructions, Player } from '@/components/dom/Instructions'
 import * as hooks from '@/utils/hooks'
 import * as R from 'react'
 import * as browser from '@/utils/browser'
@@ -27,6 +27,7 @@ function Page(props) {
         src: `${baseUrl}/florecer/source.mus`,
         format: 'mp3',
         autoplay: false,
+        html5: true,
         onend: () => console.log('sound has ended!'),
     })
 
@@ -52,7 +53,22 @@ function Page(props) {
 
     return (
         <>
-            {/* <FlorTop /> */}
+            <div
+                // eslint-disable-next-line tailwind/class-order
+                className='absolute max-w-lg px-4 py-2 text-sm transform -translate-x-1/2 bg-gray-900 shadow-xl select-none md:text-base top-8 left-1/2 text-gray-50'
+                style={{
+                    maxWidth: 'calc(100% - 28px)',
+                }}
+            >
+                <button
+                    onClick={() => {
+                        togglePlayPause()
+                    }}
+                    className='cyberpunk'
+                >
+                    Play
+                </button>
+            </div>
             <Leva
                 collapsed={{
                     collapsed,
