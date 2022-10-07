@@ -2,13 +2,12 @@ import * as R from 'react'
 import * as T from 'three'
 import * as L from 'leva'
 import * as F from '@react-three/fiber'
-import * as D from '@react-three/drei'
 import { useColoritos } from '@/utils/coloritos'
 import { useAudioPosition } from 'react-use-audio-player'
+import * as browser from '@/utils/browser'
 
 import florecerData from '../../../music/florecer.json'
 let data = florecerData as MusicAnalysis
-
 const Style = {
     base: [
         'color: #fff',
@@ -30,6 +29,8 @@ const log = (text, extra = []) => {
 }
 
 export default function FlorScene() {
+    let adjusted_particles = R.useRef(browser.isMobile() ? 20_000 : 45_000)
+
     const geo = R.useRef<T.BufferGeometry>(null!)
     const points = R.useRef<T.Points>(null!)
 
@@ -56,7 +57,7 @@ export default function FlorScene() {
         leverR: { value: 2.0, min: 0, max: 2, step: 0.001 },
         leverR2: { value: 10, min: 1, max: 10, strep: 0.001 },
         particles: {
-            value: 45_000,
+            value: adjusted_particles.current,
             min: 0,
             max: 100_000,
             step: 1_000,
@@ -76,7 +77,6 @@ export default function FlorScene() {
     const mat = R.useMemo(
         () =>
             new T.ShaderMaterial({
-                // color: '#ff5588',
                 depthWrite: false,
                 vertexColors: true,
                 blending: T.AdditiveBlending,
@@ -95,7 +95,7 @@ void main()
      * Position
      */
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
-                
+
     // Rotate
     float angle = atan(modelPosition.x, modelPosition.z);
     float distanceToCenter = length(modelPosition.xz);
@@ -273,7 +273,8 @@ void main() {
                 // console.log({ start: data.beats[0].start, delta: beatDelta, next: data.beats[0].start + data.beats[0].duration })
                 inEffect.current = true
                 beat++
-                Lset({ particles: 1 * 45_000 /** inital particles */ })
+                console.log({ particles: adjusted_particles.current })
+                Lset({ particles: 1 * adjusted_particles.current /** inital particles */ })
                 Lset({ leverCrazy: 2 * 0.45 + Math.random() /** inital particles */ })
             }
         }
@@ -281,7 +282,7 @@ void main() {
         if (inEffect.current) {
             if (position > currentBeatDuration - 2 * beatDelta) {
                 inEffect.current = false
-                Lset({ particles: 0.15 * 45_000 })
+                Lset({ particles: 0.15 * adjusted_particles.current })
                 Lset({ leverCrazy: 0.15 * 0.45 + (Math.random() * 0.3) /** inital particles */ })
                 data.beats.splice(0, 1)
             }
