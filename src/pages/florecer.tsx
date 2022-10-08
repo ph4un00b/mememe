@@ -59,8 +59,8 @@ function Page(props) {
                 >
                     {!ready && !loading ? 'Loading' : 'Play'}
                 </button>
-                <br />
                 <IfFeatureEnabled feature='florecer-debug'>
+                    <br />
                     <span>beats: {dbeats}</span>
                     <br />
                     <span>particles: {dparticles}</span>

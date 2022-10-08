@@ -29,7 +29,7 @@ function App({ Component, router, pageProps = { title: 'index' } }) {
         growthbook.setFeatures(json.features)
       })
       .catch(() => {
-        log.error('🧪', 'Failed to fetch feature definitions from GrowthBook')
+        log.error('🧪 Failed to fetch feature definitions from GrowthBook')
       })
 
     growthbook.setAttributes({
