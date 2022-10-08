@@ -59,13 +59,13 @@ function Page(props) {
                     {!ready && !loading ? 'Loading' : 'Play'}
                 </button>
                 <br />
-                {/* <span>
+                <span>
                     beats: {dbeats}
                 </span>
                 <br />
                 <span>
                     particles: {dparticles}
-                </span> */}
+                </span>
             </div>
             <Leva
                 collapsed={{
