@@ -5,6 +5,8 @@ type MyGlobalState = {
   dom: HTMLDivElement | null
   debugBeats: number
   changeBeats: (val: number) => void
+  debugSegments: number
+  changeSegments: (val: number) => void
   debugParticles: number
   changeParticles: (val: number) => void
   // color2: string;
@@ -23,6 +25,13 @@ const useStoreImpl = create<MyGlobalState>((set) => {
         debugBeats: val,
       }))
     },
+    debugSegments: 0,
+    changeSegments: (val) => {
+      set((prev) => ({
+        ...prev,
+        debugSegments: val,
+      }))
+    },
     debugParticles: 0,
     changeParticles: (val) => {
       set((prev) => ({
@@ -39,17 +48,23 @@ Object.assign(useStore, useStoreImpl)
 
 const { getState, setState } = useStoreImpl
 
-function useDebugBeats() {
+export function useDebugBeats() {
   const state = useStore((state) => state.debugBeats);
   const setState = useStore((state) => state.changeBeats);
   return [state, setState] as const;
 }
 
-function useDebugParticles() {
+export function useDebugParticles() {
   const state = useStore((state) => state.debugParticles);
   const setState = useStore((state) => state.changeParticles);
   return [state, setState] as const;
 }
 
-export { getState, setState, useDebugBeats, useDebugParticles }
+export function useDebugSegments() {
+  const state = useStore((state) => state.debugSegments);
+  const setState = useStore((state) => state.changeSegments);
+  return [state, setState] as const;
+}
+
+export { getState, setState }
 export default useStore

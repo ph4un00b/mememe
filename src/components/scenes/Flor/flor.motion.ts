@@ -2,7 +2,7 @@
 import * as R from 'react'
 import * as F from '@react-three/fiber'
 import * as T from 'three'
-import { useDebugBeats, useDebugParticles } from '@/helpers/store'
+import { useDebugBeats, useDebugParticles, useDebugSegments } from '@/helpers/store'
 import { useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../../../music/florecer.json'
 
@@ -19,6 +19,7 @@ const Style = {
 
 const styles = [Style.base, Style.warning, Style.success]
 let beat = 0
+let segment = 0
 
 const log = (text, extra = []) => {
     let style = Style.base.join(';') + ';'
@@ -49,7 +50,6 @@ export function useMotions(
         highRefreshRate: true,
     })
 
-    const inEffect = R.useRef(false)
     const [, changeDebugBeats] = useDebugBeats()
     const [, changeDebugParticles] = useDebugParticles()
 
@@ -68,6 +68,8 @@ export function useMotions(
         )
     })
 
+    const inBeatEffect = R.useRef(false)
+
     F.useFrame((state) => {
         if (!(position > 0) /** started */) {
             return
@@ -76,14 +78,14 @@ export function useMotions(
         let currentBeatDuration = data.beats[0].start + data.beats[0].duration
         let beatDelta = data.beats[0].duration / 5 /** can be whatever */
 
-        if (!inEffect.current) {
+        if (!inBeatEffect.current) {
             if (position > data.beats[0].start && position < currentBeatDuration) {
-                log('beat', styles[beat % 3])
+                // log('beat', styles[beat % 3])
                 // console.log({ start: data.beats[0].start, delta: beatDelta, next: data.beats[0].start + data.beats[0].duration })
-                inEffect.current = true
+                inBeatEffect.current = true
                 // changeDebugBeats(beat++)
                 changeDebugBeats(data.beats[0].confidence)
-                console.log({ particles: adjusted_particles.current })
+                // console.log({ particles: adjusted_particles.current })
 
                 if (data.beats[0].confidence >= 0.4) {
                     const newParticles = Math.floor(
@@ -105,9 +107,9 @@ export function useMotions(
             camera.rotateZ(state.clock.elapsedTime * 0.5)
         }
 
-        if (inEffect.current) {
+        if (inBeatEffect.current) {
             if (position > currentBeatDuration - 2 * beatDelta) {
-                inEffect.current = false
+                inBeatEffect.current = false
                 const newParticles = 1 * adjusted_particles.current
                 changeDebugParticles(newParticles)
                 Lset({ particles: newParticles })
@@ -117,6 +119,41 @@ export function useMotions(
             }
         }
     })
+
+
+    // const inSegmentEffect = R.useRef(false)
+    // const [, changeDebugSegments] = useDebugSegments()
+    // F.useFrame((state) => {
+    //     if (!(position > 0) /** started */) return
+
+    //     let currentSegmentDuration =
+    //         data.segments[0].start + data.segments[0].duration
+    //     let segmentDelta = data.segments[0].duration / 5 /** can be whatever */
+
+    //     if (!inSegmentEffect.current) {
+    //         if (
+    //             position > data.segments[0].start &&
+    //             position < currentSegmentDuration
+    //         ) {
+    //             log('segments', styles[segment % 3])
+    //             changeDebugSegments(data.segments[0].confidence)
+    //             console.log({
+    //                 start: data.segments[0].start,
+    //                 delta: segmentDelta,
+    //                 next: data.segments[0].start + data.segments[0].duration,
+    //             })
+    //             inSegmentEffect.current = true
+    //             segment++
+    //         }
+    //     }
+
+    //     if (inSegmentEffect.current) {
+    //         if (position > currentSegmentDuration - 2 * segmentDelta) {
+    //             inSegmentEffect.current = false
+    //             data.segments.splice(0, 1)
+    //         }
+    //     }
+    // })
 }
 
 // F.useFrame((state) => {

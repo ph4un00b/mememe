@@ -8,7 +8,7 @@ import * as hooks from '@/utils/hooks'
 import * as R from 'react'
 import * as browser from '@/utils/browser'
 import { useAudioPlayer } from 'react-use-audio-player'
-import { useDebugBeats, useDebugParticles } from '@/helpers/store'
+import { useDebugBeats, useDebugParticles, useDebugSegments } from '@/helpers/store'
 import { IfFeatureEnabled } from '@growthbook/growthbook-react'
 
 // const Box = dynamic(() => import('@/components/canvas/Box'), {
@@ -39,6 +39,7 @@ function Page(props) {
 
     const [dbeats] = useDebugBeats()
     const [dparticles] = useDebugParticles()
+    const [dsegments] = useDebugSegments()
     return (
         <>
             <div
@@ -62,6 +63,8 @@ function Page(props) {
                     <span>beats: {dbeats}</span>
                     <br />
                     <span>particles: {dparticles}</span>
+                    <br />
+                    <span>segments: {dsegments}</span>
                 </IfFeatureEnabled>
             </div>
             <Leva
