@@ -12,8 +12,8 @@ import { florAttributes } from './flor.attr'
 import { useMotions } from './flor.motion'
 
 export default function FlorScene() {
-    let adjusted_particles = R.useRef(browser.isMobile() ? 20_000 : 100_000)
-    const geo = R.useRef<T.BufferGeometry>(null!)
+    let adjustedParticles = R.useRef(browser.isMobile() ? 20_000 : 70_000)
+    const geometry = R.useRef<T.BufferGeometry>(null!)
     const points = R.useRef<T.Points>(null!)
 
     const [
@@ -29,7 +29,7 @@ export default function FlorScene() {
             leverR2,
         },
         Lset,
-    ] = L.useControls(() => florControls(adjusted_particles))
+    ] = L.useControls(() => florControls(adjustedParticles))
 
     const { gl, viewport, size } = F.useThree()
     /** @link https://github.com/pmndrs/react-three-fiber/discussions/1012 */
@@ -37,7 +37,7 @@ export default function FlorScene() {
     // viewport -> size in three units
     // size -> size in pixels
 
-    const mat = R.useMemo(
+    const shader = R.useMemo(
         () =>
             new T.ShaderMaterial({
                 depthWrite: false,
@@ -55,8 +55,8 @@ export default function FlorScene() {
 
     R.useLayoutEffect(() => {
         if (points.current) {
-            geo.current.dispose()
-            mat.dispose()
+            geometry.current.dispose()
+            shader.dispose()
             // scene.remove(points.current);
         }
     }, [particles, offset, leverC, leverCrazy, leverD, leverE, leverR, leverR2])
@@ -76,13 +76,13 @@ export default function FlorScene() {
     }, [particles, offset, leverC, leverCrazy, leverD, leverE, leverR, leverR2])
 
     F.useFrame(({ clock }) => {
-        const t = clock.getElapsedTime()
-        geo.current.attributes.position.needsUpdate = true
-        points.current.rotation.y = t * 0.2
-        mat.uniforms.uTime.value = t
+        const time = clock.getElapsedTime()
+        geometry.current.attributes.position.needsUpdate = true
+        points.current.rotation.y = time * 0.2
+        shader.uniforms.uTime.value = time
     })
 
-    useMotions(adjusted_particles, Lset, points)
+    useMotions(adjustedParticles, Lset, points)
 
     return (
         <points
@@ -90,9 +90,9 @@ export default function FlorScene() {
             position={[0, 0, 0]}
             ref={points}
             // castShadow={true}
-            material={mat}
+            material={shader}
         >
-            <bufferGeometry ref={geo}>
+            <bufferGeometry ref={geometry}>
                 <bufferAttribute
                     attach='attributes-position'
                     array={arrays[0]}
