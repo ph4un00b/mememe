@@ -7,6 +7,7 @@ import { useAudioPosition } from 'react-use-audio-player'
 import * as browser from '@/utils/browser'
 
 import florecerData from '../../../music/florecer.json'
+import { useDebugBeats, useDebugParticles } from '@/helpers/store'
 let data = florecerData as MusicAnalysis
 const Style = {
     base: [
@@ -29,8 +30,7 @@ const log = (text, extra = []) => {
 }
 
 export default function FlorScene() {
-    let adjusted_particles = R.useRef(browser.isMobile() ? 20_000 : 45_000)
-
+    let adjusted_particles = R.useRef(browser.isMobile() ? 20_000 : 85_000)
     const geo = R.useRef<T.BufferGeometry>(null!)
     const points = R.useRef<T.Points>(null!)
 
@@ -261,6 +261,8 @@ void main() {
     })
 
     const inEffect = R.useRef(false)
+    const [, changeDebugBeats] = useDebugBeats()
+    const [, changeDebugParticles] = useDebugParticles()
     F.useFrame((state) => {
         if (!(position > 0) /** started */) return
 
@@ -272,18 +274,29 @@ void main() {
                 log('beat', styles[beat % 3])
                 // console.log({ start: data.beats[0].start, delta: beatDelta, next: data.beats[0].start + data.beats[0].duration })
                 inEffect.current = true
-                beat++
+                // changeDebugBeats(beat++)
+                changeDebugBeats(data.beats[0].confidence)
                 console.log({ particles: adjusted_particles.current })
-                Lset({ particles: 1 * adjusted_particles.current /** inital particles */ })
-                Lset({ leverCrazy: 2 * 0.45 + Math.random() /** inital particles */ })
+
+                if (data.beats[0].confidence > 0.4) {
+                    const newParticles = Math.floor(
+                        Math.random() * 0.2 * adjusted_particles.current
+                    )
+                    changeDebugParticles(newParticles)
+                    Lset({ particles: newParticles })
+                    Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
+                }
             }
         }
 
         if (inEffect.current) {
             if (position > currentBeatDuration - 2 * beatDelta) {
                 inEffect.current = false
-                Lset({ particles: 0.15 * adjusted_particles.current })
-                Lset({ leverCrazy: 0.15 * 0.45 + (Math.random() * 0.3) /** inital particles */ })
+                const newParticles = 1 * adjusted_particles.current
+                changeDebugParticles(newParticles)
+                Lset({ particles: newParticles })
+                Lset({ leverCrazy: 2 * 0.45 + Math.random() })
+
                 data.beats.splice(0, 1)
             }
         }

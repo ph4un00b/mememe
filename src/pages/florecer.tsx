@@ -10,6 +10,7 @@ import * as R from 'react'
 import * as browser from '@/utils/browser'
 import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../music/florecer.json'
+import { useDebugBeats, useDebugParticles } from '@/helpers/store'
 
 // const Box = dynamic(() => import('@/components/canvas/Box'), {
 //     ssr: false,
@@ -18,7 +19,6 @@ let baseUrl = 'https://ph4un00b.github.io/data'
 
 function Page(props) {
     const [collapsed, setCollapsed] = R.useState(true)
-    X.log.debug('🌸', { sopa: 'init' })
 
     const { togglePlayPause, ready, loading, playing } = useAudioPlayer({
         src: `${baseUrl}/florecer/source.mus`,
@@ -29,6 +29,7 @@ function Page(props) {
     })
 
     hooks.useTimeout(() => {
+        console.log('out?')
         if (browser.isMobile()) X.log.debug('📲', { sopa: 'mobile' })
         if (browser.isMobile()) return
         setCollapsed(!true)
@@ -37,6 +38,8 @@ function Page(props) {
     // if (!ready && !loading) return <div>No audio to play</div>
     // if (loading) return <div>Loading audio</div>
 
+    const [dbeats] = useDebugBeats()
+    const [dparticles] = useDebugParticles()
     return (
         <>
             <div
@@ -48,12 +51,21 @@ function Page(props) {
             >
                 <button
                     onClick={() => {
+                        X.log.debug('🌸', { sopa: 'toggle 🎼' })
                         togglePlayPause()
                     }}
                     className='cyberpunk'
                 >
                     {!ready && !loading ? 'Loading' : 'Play'}
                 </button>
+                <br />
+                <span>
+                    beats: {dbeats}
+                </span>
+                <br />
+                <span>
+                    particles: {dparticles}
+                </span>
             </div>
             <Leva
                 collapsed={{
