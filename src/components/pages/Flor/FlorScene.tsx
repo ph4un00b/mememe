@@ -8,6 +8,8 @@ import * as browser from '@/utils/browser'
 
 import florecerData from '../../../music/florecer.json'
 import { useDebugBeats, useDebugParticles } from '@/helpers/store'
+import { florControls } from './flor.controls'
+import vertexShader from './flor.vertex.glsl'
 let data = florecerData as MusicAnalysis
 const Style = {
     base: [
@@ -47,26 +49,7 @@ export default function FlorScene() {
             leverR2,
         },
         Lset,
-    ] = L.useControls(() => ({
-        leverA: { value: 0.65, min: 0, max: 2, step: 0.01 },
-        offset: { value: 0.0, min: 0, max: 1, step: 0.01 },
-        leverC: { value: 1, min: 1, max: 20, step: 1 },
-        leverD: { value: 17, min: 0, max: 20, step: 1 },
-        leverE: { value: 1.68, min: 0, max: 2, step: 0.001 },
-        leverCrazy: { value: 0.45, min: 0.01, max: 2, step: 0.01 },
-        leverR: { value: 2.0, min: 0, max: 2, step: 0.001 },
-        leverR2: { value: 10, min: 1, max: 10, strep: 0.001 },
-        particles: {
-            value: adjusted_particles.current,
-            min: 0,
-            max: 100_000,
-            // step: 1_000,
-            // onChange: (v) => {
-            //     // imperatively update the world after Leva input changes
-            //     console.log(v)
-            // },
-        },
-    }))
+    ] = L.useControls(() => florControls(adjusted_particles))
 
     const { gl, viewport, size } = F.useThree()
     /** @link https://github.com/pmndrs/react-three-fiber/discussions/1012 */
@@ -80,48 +63,7 @@ export default function FlorScene() {
                 depthWrite: false,
                 vertexColors: true,
                 blending: T.AdditiveBlending,
-                vertexShader: `
-uniform float uTime;
-uniform float uSize;
-
-attribute vec3 aRandomness;
-attribute float aScale;
-
-varying vec3 vColor;
-
-void main()
-{
-    /**
-     * Position
-     */
-    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
-
-    // Rotate
-    float angle = atan(modelPosition.x, modelPosition.z);
-    float distanceToCenter = length(modelPosition.xz);
-    float angleOffset = (1.0 / distanceToCenter) * uTime;
-    angle += angleOffset;
-    modelPosition.x = cos(angle) * distanceToCenter;
-    modelPosition.z = sin(angle) * distanceToCenter;
-
-    // tu mamá en tanga ╰(*°▽°*)╯!!!
-
-    vec4 viewPosition = viewMatrix * modelPosition;
-    vec4 projectedPosition = projectionMatrix * viewPosition;
-    gl_Position = projectedPosition;
-
-    /**
-     * Size
-     */
-    gl_PointSize = uSize * aScale;
-    gl_PointSize *= (1.0 / - viewPosition.z);
-
-    /**
-     * Color
-     */
-    vColor = color;
-}
-        `,
+                vertexShader: vertexShader,
                 fragmentShader: `
         /** context -> inputs */
 
@@ -269,8 +211,12 @@ void main() {
     F.useFrame((state) => {
         if (!(position > 0) /** started */) return
         // wtf nice ( •_•)>⌐■-■
-        camera.position.z = Math.cos(camera.position.z + state.clock.elapsedTime * 0.1);
-        camera.position.x = Math.sin(camera.position.x + state.clock.elapsedTime * 0.1);
+        camera.position.z = Math.cos(
+            camera.position.z + state.clock.elapsedTime * 0.1
+        )
+        camera.position.x = Math.sin(
+            camera.position.x + state.clock.elapsedTime * 0.1
+        )
     })
 
     F.useFrame((state) => {
