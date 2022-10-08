@@ -24,7 +24,7 @@ function Page(props) {
         src: `${baseUrl}/florecer/source.mus`,
         format: 'mp3',
         autoplay: false,
-        html5: true,
+        html5: false,
         onend: () => console.log('sound has ended!'),
     })
 
