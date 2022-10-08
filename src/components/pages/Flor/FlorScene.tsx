@@ -30,7 +30,7 @@ const log = (text, extra = []) => {
 }
 
 export default function FlorScene() {
-    let adjusted_particles = R.useRef(browser.isMobile() ? 20_000 : 85_000)
+    let adjusted_particles = R.useRef(browser.isMobile() ? 20_000 : 100_000)
     const geo = R.useRef<T.BufferGeometry>(null!)
     const points = R.useRef<T.Points>(null!)
 
@@ -60,7 +60,7 @@ export default function FlorScene() {
             value: adjusted_particles.current,
             min: 0,
             max: 100_000,
-            step: 1_000,
+            // step: 1_000,
             // onChange: (v) => {
             //     // imperatively update the world after Leva input changes
             //     console.log(v)
@@ -278,13 +278,18 @@ void main() {
                 changeDebugBeats(data.beats[0].confidence)
                 console.log({ particles: adjusted_particles.current })
 
-                if (data.beats[0].confidence > 0.4) {
+                if (data.beats[0].confidence >= 0.4) {
                     const newParticles = Math.floor(
                         Math.random() * 0.2 * adjusted_particles.current
                     )
                     changeDebugParticles(newParticles)
                     Lset({ particles: newParticles })
                     Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
+                }
+
+                if (data.beats[0].confidence < 0.4) {
+                    points.current.rotateX(0.5)
+                    points.current.rotateY(0.5)
                 }
             }
         }
