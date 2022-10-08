@@ -7,6 +7,8 @@ type MyGlobalState = {
   changeBeats: (val: number) => void
   debugSegments: number
   changeSegments: (val: number) => void
+  debugSections: number
+  changeSections: (val: number) => void
   debugParticles: number
   changeParticles: (val: number) => void
   // color2: string;
@@ -27,6 +29,13 @@ const useStoreImpl = create<MyGlobalState>((set) => {
     },
     debugSegments: 0,
     changeSegments: (val) => {
+      set((prev) => ({
+        ...prev,
+        debugSegments: val,
+      }))
+    },
+    debugSections: 0,
+    changeSections: (val) => {
       set((prev) => ({
         ...prev,
         debugSegments: val,
@@ -63,6 +72,12 @@ export function useDebugParticles() {
 export function useDebugSegments() {
   const state = useStore((state) => state.debugSegments);
   const setState = useStore((state) => state.changeSegments);
+  return [state, setState] as const;
+}
+
+export function useDebugSections() {
+  const state = useStore((state) => state.debugSections);
+  const setState = useStore((state) => state.changeSections);
   return [state, setState] as const;
 }
 

@@ -2,7 +2,7 @@
 import * as R from 'react'
 import * as F from '@react-three/fiber'
 import * as T from 'three'
-import { useDebugBeats, useDebugParticles, useDebugSegments } from '@/helpers/store'
+import { useDebugBeats, useDebugParticles, useDebugSections, useDebugSegments } from '@/helpers/store'
 import { useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../../../music/florecer.json'
 
@@ -20,6 +20,7 @@ const Style = {
 const styles = [Style.base, Style.warning, Style.success]
 let beat = 0
 let segment = 0
+let section = 0
 
 const log = (text, extra = []) => {
     let style = Style.base.join(';') + ';'
@@ -116,6 +117,40 @@ export function useMotions(
                 Lset({ leverCrazy: 2 * 0.45 + Math.random() })
 
                 data.beats.splice(0, 1)
+            }
+        }
+    })
+
+    const inSectionEffect = R.useRef(false)
+    const [, changeDebugSections] = useDebugSections()
+    F.useFrame((state) => {
+        if (!(position > 0) /** started */) return
+
+        let cSectionDuration =
+            data.sections[0].start + data.sections[0].duration
+        let sectionDelta = data.sections[0].duration / 5 /** can be whatever */
+
+        if (!inSectionEffect.current) {
+            if (
+                position > data.sections[0].start &&
+                position < cSectionDuration
+            ) {
+                log('sections', styles[section % 3])
+                changeDebugSections(data.sections[0].confidence)
+                console.log({
+                    start: data.sections[0].start,
+                    delta: sectionDelta,
+                    next: data.sections[0].start + data.sections[0].duration,
+                })
+                inSectionEffect.current = true
+                section++
+            }
+        }
+
+        if (inSectionEffect.current) {
+            if (position > cSectionDuration - 2 * sectionDelta) {
+                inSectionEffect.current = false
+                data.sections.splice(0, 1)
             }
         }
     })
