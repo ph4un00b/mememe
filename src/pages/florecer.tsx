@@ -59,13 +59,13 @@ function Page(props) {
                     {!ready && !loading ? 'Loading' : 'Play'}
                 </button>
                 <br />
-                <span>
+                {/* <span>
                     beats: {dbeats}
                 </span>
                 <br />
                 <span>
                     particles: {dparticles}
-                </span>
+                </span> */}
             </div>
             <Leva
                 collapsed={{
@@ -86,7 +86,7 @@ Page.r3f = function (props) {
                 position={[0, 0, 1]}
                 fov={75}
                 // auto updates the viewport
-                manual={false}
+                manual={true} //todo: how this affect?
                 makeDefault={true}
             />
 

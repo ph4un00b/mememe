@@ -263,6 +263,16 @@ void main() {
     const inEffect = R.useRef(false)
     const [, changeDebugBeats] = useDebugBeats()
     const [, changeDebugParticles] = useDebugParticles()
+
+    const { camera } = F.useThree()
+
+    F.useFrame((state) => {
+        if (!(position > 0) /** started */) return
+        // wtf nice ( •_•)>⌐■-■
+        camera.position.z = Math.cos(camera.position.z + state.clock.elapsedTime * 0.1);
+        camera.position.x = Math.sin(camera.position.x + state.clock.elapsedTime * 0.1);
+    })
+
     F.useFrame((state) => {
         if (!(position > 0) /** started */) return
 
@@ -292,6 +302,10 @@ void main() {
                     points.current.rotateY(0.5)
                 }
             }
+        }
+
+        if (data.beats[0].confidence < 0.4) {
+            camera.rotateZ(state.clock.elapsedTime * 0.5)
         }
 
         if (inEffect.current) {
