@@ -11,7 +11,7 @@ const LCanvas = dynamic(() => import('@/components/layout/canvas'), {
   ssr: true,
 })
 
-const FEATURES_ENDPOINT = 'https://plinks.deno.dev/growthbook'
+const FEATURES_ENDPOINT = 'https://fauflags.deno.dev'
 
 const growthbook = new GrowthBook({
   trackingCallback: (experiment, result) => {
