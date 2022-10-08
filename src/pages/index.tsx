@@ -2,8 +2,8 @@ import dynamic from 'next/dynamic'
 
 // Step 5 - delete Instructions components
 // import Instructions from '@/components/dom/Instructions'
-import { Fondo } from '@/components/pages/Home/Fondo'
-import { Phau } from '@/components/pages/Home/Phau'
+import { Fondo } from '@/components/scenes/Home/Fondo'
+import { Phau } from '@/components/scenes/Home/Phau'
 import * as meta from '@/config'
 // import Shader from '@/components/canvas/Shader/Shader'
 

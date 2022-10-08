@@ -1,6 +1,6 @@
 
 import dynamic from 'next/dynamic'
-import FlorScene from '@/components/pages/Flor/FlorScene'
+import FlorScene from '@/components/scenes/Flor/FlorScene'
 import * as meta from '@/config'
 import { PerspectiveCamera } from '@react-three/drei'
 import * as X from 'next-axiom'
