@@ -7,9 +7,15 @@ import { Leva } from 'leva'
 import * as hooks from '@/utils/hooks'
 import * as R from 'react'
 import * as browser from '@/utils/browser'
-import { useAudioPlayer } from 'react-use-audio-player'
-import { useDebugBeats, useDebugParticles, useDebugSections, useDebugSegments } from '@/helpers/store'
+import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
+import {
+    useDebugBeats,
+    useDebugParticles,
+    useDebugSections,
+    useDebugSegments,
+} from '@/helpers/store'
 import { IfFeatureEnabled } from '@growthbook/growthbook-react'
+import florecerData from '../music/florecer.json'
 
 // const Box = dynamic(() => import('@/components/canvas/Box'), {
 //     ssr: false,
@@ -26,6 +32,8 @@ function Page(props) {
         html5: false,
         onend: () => console.log('sound has ended!'),
     })
+
+    const { percentComplete, duration, seek } = useAudioPosition({ highRefreshRate: true })
 
     hooks.useTimeout(() => {
         console.log('out?')
@@ -68,6 +76,15 @@ function Page(props) {
                     <span>segments: {dsegments}</span> */}
                     <br />
                     <span>sections: {dsection}</span>
+                    {florecerData.sections.map((section, idx) => {
+                        return (
+                            <button onClick={() => {
+                                seek(section.start)
+                            }} className='cyberpunk' key={idx}>
+                                sec-{idx}, {section.confidence}
+                            </button>
+                        )
+                    })}
                 </IfFeatureEnabled>
             </div>
             <Leva

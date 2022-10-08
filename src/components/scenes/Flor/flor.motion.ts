@@ -2,7 +2,12 @@
 import * as R from 'react'
 import * as F from '@react-three/fiber'
 import * as T from 'three'
-import { useDebugBeats, useDebugParticles, useDebugSections, useDebugSegments } from '@/helpers/store'
+import {
+    useDebugBeats,
+    useDebugParticles,
+    useDebugSections,
+    useDebugSegments,
+} from '@/helpers/store'
 import { useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../../../music/florecer.json'
 
@@ -28,8 +33,6 @@ const log = (text, extra = []) => {
     console.log(`%c${text}`, style)
 }
 
-let data = florecerData as MusicAnalysis
-
 export function useMotions(
     adjusted_particles: R.MutableRefObject<number>,
     Lset: (value: {
@@ -47,6 +50,11 @@ export function useMotions(
         T.Points<T.BufferGeometry, T.Material | T.Material[]>
     >
 ) {
+    let data = R.useMemo(
+        () => window.structuredClone(florecerData) as MusicAnalysis,
+        []
+    )
+
     const { percentComplete, duration, seek, position } = useAudioPosition({
         highRefreshRate: true,
     })
@@ -126,15 +134,11 @@ export function useMotions(
     F.useFrame((state) => {
         if (!(position > 0) /** started */) return
 
-        let cSectionDuration =
-            data.sections[0].start + data.sections[0].duration
+        let cSectionDuration = data.sections[0].start + data.sections[0].duration
         let sectionDelta = data.sections[0].duration / 5 /** can be whatever */
 
         if (!inSectionEffect.current) {
-            if (
-                position > data.sections[0].start &&
-                position < cSectionDuration
-            ) {
+            if (position > data.sections[0].start && position < cSectionDuration) {
                 log('sections', styles[section % 3])
                 changeDebugSections(data.sections[0].confidence)
                 console.log({
@@ -154,7 +158,6 @@ export function useMotions(
             }
         }
     })
-
 
     // const inSegmentEffect = R.useRef(false)
     // const [, changeDebugSegments] = useDebugSegments()
