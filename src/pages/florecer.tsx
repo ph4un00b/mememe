@@ -11,6 +11,7 @@ import * as browser from '@/utils/browser'
 import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../music/florecer.json'
 import { useDebugBeats, useDebugParticles } from '@/helpers/store'
+import { IfFeatureEnabled } from '@growthbook/growthbook-react'
 
 // const Box = dynamic(() => import('@/components/canvas/Box'), {
 //     ssr: false,
@@ -59,13 +60,11 @@ function Page(props) {
                     {!ready && !loading ? 'Loading' : 'Play'}
                 </button>
                 <br />
-                <span>
-                    beats: {dbeats}
-                </span>
-                <br />
-                <span>
-                    particles: {dparticles}
-                </span>
+                <IfFeatureEnabled feature='florecer-debug'>
+                    <span>beats: {dbeats}</span>
+                    <br />
+                    <span>particles: {dparticles}</span>
+                </IfFeatureEnabled>
             </div>
             <Leva
                 collapsed={{
