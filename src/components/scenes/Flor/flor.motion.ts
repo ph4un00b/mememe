@@ -34,6 +34,7 @@ const log = (text, extra = []) => {
 
 type ParamsProps = {
   /** @todo make always available?*/ next?: number
+    current?: number
     chunk: Beat | Section
     state: F.RootState
 }
@@ -50,6 +51,7 @@ export function useMotions(
         []
     )
     let currentChunk = R.useRef(analysis.beats[0])
+    let currentIndex = R.useRef(0)
     const { position } = useAudioPosition({
         highRefreshRate: true,
     })
@@ -61,6 +63,7 @@ export function useMotions(
     R.useEffect(() => {
         const index = nextChunkIndex({ songPosition: position, type })
         currentChunk.current = analysis[type][index]
+        currentIndex.current = index
     }, [songPosition])
 
     F.useFrame((state) => {
@@ -89,13 +92,14 @@ export function useMotions(
             }
         }
 
-        frameCallback({ chunk: cChunk, state })
+        frameCallback({ chunk: cChunk, state, current: currentIndex.current })
 
         if (inMotion.current) {
             // log('frame -inBeatEffect.current', styles[3 % 3])
             if (position > cEnd - 2 * cDelta) {
                 // todo: better name
                 const index = nextChunkIndex({ songPosition: position, type })
+                currentIndex.current = index
                 currentChunk.current = analysis[type][index]
 
                 inactiveCallback({ next: index, chunk: cChunk, state })
