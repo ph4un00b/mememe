@@ -50,10 +50,7 @@ export function useMotions(
         T.Points<T.BufferGeometry, T.Material | T.Material[]>
     >
 ) {
-    let data = R.useMemo(
-        () => window.structuredClone(florecerData) as MusicAnalysis,
-        []
-    )
+    let data = R.useRef<MusicAnalysis>(window.structuredClone(florecerData))
 
     const { percentComplete, duration, seek, position } = useAudioPosition({
         highRefreshRate: true,
@@ -84,19 +81,21 @@ export function useMotions(
             return
         }
 
-        let currentBeatDuration = data.beats[0].start + data.beats[0].duration
-        let beatDelta = data.beats[0].duration / 5 /** can be whatever */
+        let currentBeat = data.current.beats[0]
+        // console.log(currentBeat.start)
+        let currentBeatDuration = currentBeat.start + currentBeat.duration
+        let beatDelta = currentBeat.duration / 5 /** can be whatever */
 
         if (!inBeatEffect.current) {
-            if (position > data.beats[0].start && position < currentBeatDuration) {
-                // log('beat', styles[beat % 3])
-                // console.log({ start: data.beats[0].start, delta: beatDelta, next: data.beats[0].start + data.beats[0].duration })
+            if (position > currentBeat.start && position < currentBeatDuration) {
+                log('beat', styles[beat % 3])
+                // console.log({ start: currentBeat.start, delta: beatDelta, next: currentBeat.start + currentBeat.duration })
                 inBeatEffect.current = true
-                // changeDebugBeats(beat++)
-                changeDebugBeats(data.beats[0].confidence)
+                changeDebugBeats(beat++)
+                // changeDebugBeats(currentBeat.confidence)
                 // console.log({ particles: adjusted_particles.current })
 
-                if (data.beats[0].confidence >= 0.4) {
+                if (currentBeat.confidence >= 0.4) {
                     const newParticles = Math.floor(
                         Math.random() * 0.2 * adjusted_particles.current
                     )
@@ -105,14 +104,14 @@ export function useMotions(
                     Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
                 }
 
-                if (data.beats[0].confidence < 0.4) {
+                if (currentBeat.confidence < 0.4) {
                     points.current.rotateX(0.5)
                     points.current.rotateY(0.5)
                 }
             }
         }
 
-        if (data.beats[0].confidence < 0.4) {
+        if (currentBeat.confidence < 0.4) {
             camera.rotateZ(state.clock.elapsedTime * 0.5)
         }
 
@@ -124,7 +123,8 @@ export function useMotions(
                 Lset({ particles: newParticles })
                 Lset({ leverCrazy: 2 * 0.45 + Math.random() })
 
-                data.beats.splice(0, 1)
+                console.log('pos', newBeats(position))
+                data.current.beats.splice(0, 1)
             }
         }
     })
@@ -134,17 +134,17 @@ export function useMotions(
     F.useFrame((state) => {
         if (!(position > 0) /** started */) return
 
-        let cSectionDuration = data.sections[0].start + data.sections[0].duration
-        let sectionDelta = data.sections[0].duration / 5 /** can be whatever */
+        let cSectionDuration = data.current.sections[0].start + data.current.sections[0].duration
+        let sectionDelta = data.current.sections[0].duration / 5 /** can be whatever */
 
         if (!inSectionEffect.current) {
-            if (position > data.sections[0].start && position < cSectionDuration) {
+            if (position > data.current.sections[0].start && position < cSectionDuration) {
                 log('sections', styles[section % 3])
-                changeDebugSections(data.sections[0].confidence)
+                changeDebugSections(data.current.sections[0].confidence)
                 console.log({
-                    start: data.sections[0].start,
+                    start: data.current.sections[0].start,
                     delta: sectionDelta,
-                    next: data.sections[0].start + data.sections[0].duration,
+                    next: data.current.sections[0].start + data.current.sections[0].duration,
                 })
                 inSectionEffect.current = true
                 section++
@@ -154,7 +154,7 @@ export function useMotions(
         if (inSectionEffect.current) {
             if (position > cSectionDuration - 2 * sectionDelta) {
                 inSectionEffect.current = false
-                data.sections.splice(0, 1)
+                data.current.sections.splice(0, 1)
             }
         }
     })
@@ -199,7 +199,7 @@ export function useMotions(
 
 //     let currentBeatDuration = data.bars[0].start + data.bars[0].duration
 //     let beatDelta = data.bars[0].duration / 5 /** can be whatever */
-//     // console.log({ start: data.beats[0].start, delta: beatDelta, next: data.beats[0].start + data.beats[0].duration })
+//     // console.log({ start: currentBeat.start, delta: beatDelta, next: currentBeat.start + currentBeat.duration })
 //     // console.log(position)
 
 //     if (!inEffect.current) {
@@ -221,14 +221,14 @@ export function useMotions(
 // F.useFrame((state) => {
 //     if (!(position > 0) /** started */) return
 
-//     let currentBeatDuration = data.sections[0].start + data.sections[0].duration
-//     let beatDelta = data.sections[0].duration / 5 /** can be whatever */
+//     let currentBeatDuration = data.current.sections[0].start + data.current.sections[0].duration
+//     let beatDelta = data.current.sections[0].duration / 5 /** can be whatever */
 //     // console.log(position)
 
 //     if (!inEffect.current) {
-//         if (position > data.sections[0].start && position < currentBeatDuration) {
+//         if (position > data.current.sections[0].start && position < currentBeatDuration) {
 //             log('sections', styles[beat % 3])
-//             console.log({ start: data.sections[0].start, next: data.sections[0].start + data.sections[0].duration })
+//             console.log({ start: data.current.sections[0].start, next: data.current.sections[0].start + data.current.sections[0].duration })
 //             inEffect.current = true
 //             beat++
 //         }
@@ -237,7 +237,7 @@ export function useMotions(
 //     if (inEffect.current) {
 //         if (position > currentBeatDuration - 2 * beatDelta) {
 //             inEffect.current = false
-//             data.sections.splice(0, 1)
+//             data.current.sections.splice(0, 1)
 //         }
 //     }
 // })
@@ -252,7 +252,7 @@ export function useMotions(
 //     if (!inEffect.current) {
 //         if (position > data.tatums[0].start && position < currentBeatDuration) {
 //             log('tatums', styles[beat % 3])
-//             console.log({ start: data.tatums[0].start, next: data.tatums[0].start + data.sections[0].duration })
+//             console.log({ start: data.tatums[0].start, next: data.tatums[0].start + data.current.sections[0].duration })
 //             inEffect.current = true
 //             beat++
 //         }
@@ -358,4 +358,18 @@ export interface Tatum {
     start: number
     duration: number
     confidence: number
+}
+
+function newBeats(position: number): number {
+    for (let idx = 0; idx < florecerData.beats.length; idx++) {
+        const beat = florecerData.beats[idx]
+
+        let beatDuration = beat.start + beat.duration
+
+        if (position > beat.start && position < beatDuration) {
+            return idx + 1
+        } else {
+            continue
+        }
+    }
 }
