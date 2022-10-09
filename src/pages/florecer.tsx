@@ -87,9 +87,9 @@ function Page(props) {
                     return (
                         <button onClick={() => {
                             seek(section.start)
-                            // changePosition(section.start)
+                            changePosition(section.start)
                         }} className='cyberpunk' key={idx}>
-                            sec-{idx}, {section.confidence}
+                            {idx} - {section.confidence}
                         </button>
                     )
                 })}
