@@ -53,7 +53,7 @@ const useStoreImpl = create<MyGlobalState>((set) => {
     songPosition: 0,
     changeSongPosition: (val) => {
       set((prev) => {
-        console.log(`prev`, prev)
+        // console.log(`prev`, prev)
         return ({
           ...prev,
           songPosition: val,

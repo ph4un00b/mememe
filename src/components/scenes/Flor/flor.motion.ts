@@ -32,6 +32,7 @@ let section = 0
 const log = (text, extra = []) => {
     let style = Style.base.join(';') + ';'
     style += extra.join(';') // Add any additional styles
+    // eslint-disable-next-line no-console
     console.log(`%c${text}`, style)
 }
 
@@ -77,13 +78,13 @@ export function useMotions(
         camera.position.z = Math.cos(
             camera.position.z + state.clock.elapsedTime * 0.1
         )
+
         camera.position.x = Math.sin(
             camera.position.x + state.clock.elapsedTime * 0.1
         )
     })
 
     const inBeatEffect = R.useRef(false)
-
     const { playing } = useAudioPlayer()
 
     const [songPosition] = useSongPosition()
