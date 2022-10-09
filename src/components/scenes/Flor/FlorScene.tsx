@@ -108,12 +108,13 @@ export default function FlorScene() {
     })
 
     useMotions(
+        { type: 'beats' },
         function inactiveCallback({ next }) {
             const newParticles = 1 * adjustedParticles.current
             changeDebugParticles(newParticles)
+            changeDebugBeats(next)
             Lset({ particles: newParticles })
             Lset({ leverCrazy: 2 * 0.45 + Math.random() })
-            changeDebugBeats(next)
         },
         function activeCallback({ chunk }) {
             if (chunk.confidence >= 0.4) {
@@ -135,8 +136,7 @@ export default function FlorScene() {
             if (chunk.confidence < 0.4) {
                 camera.rotateZ(state.clock.elapsedTime * 0.5)
             }
-        },
-        { type: 'beats' }
+        }
     )
 
     return (

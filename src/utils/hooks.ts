@@ -38,6 +38,7 @@ export function useEventListener(eventName, handler, element = window) {
             // On
             const isSupported = element && element.addEventListener;
 
+            // eslint-disable-next-line no-console
             if (!isSupported) console.error(`not suported: ${eventName} on`, element);
             if (!isSupported) return;
             // Create event listener that calls handler function stored in ref

@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import * as R from 'react'
 import * as F from '@react-three/fiber'
-import * as T from 'three'
 import {
     useDebugBeats,
     useDebugParticles,
@@ -40,10 +39,10 @@ type ParamsProps = {
 }
 
 export function useMotions(
+    { type }: { type: 'beats' | 'sections' },
     inactiveCallback: (params: ParamsProps) => void,
     activeCallback: (params: ParamsProps) => void,
     frameCallback: (params: ParamsProps) => void,
-    { type }: { type: 'beats' | 'sections' }
 ) {
     // let data = R.useRef<MusicAnalysis>(window.structuredClone(florecerData))
     let analysis = R.useMemo(
@@ -60,8 +59,8 @@ export function useMotions(
     const [songPosition] = useSongPosition()
 
     R.useEffect(() => {
-        const next = nextChunk({ songPosition: position, type })
-        currentChunk.current = analysis[type][next]
+        const index = nextChunkIndex({ songPosition: position, type })
+        currentChunk.current = analysis[type][index]
     }, [songPosition])
 
     F.useFrame((state) => {
@@ -96,10 +95,10 @@ export function useMotions(
             // log('frame -inBeatEffect.current', styles[3 % 3])
             if (position > cEnd - 2 * cDelta) {
                 // todo: better name
-                const next = nextChunk({ songPosition: position, type })
-                currentChunk.current = analysis[type][next]
+                const index = nextChunkIndex({ songPosition: position, type })
+                currentChunk.current = analysis[type][index]
 
-                inactiveCallback({ next, chunk: cChunk, state })
+                inactiveCallback({ next: index, chunk: cChunk, state })
                 inMotion.current = false
             }
         }
@@ -108,7 +107,7 @@ export function useMotions(
     })
 }
 
-function nextChunk({
+function nextChunkIndex({
     songPosition,
     type,
 }: {
@@ -119,7 +118,6 @@ function nextChunk({
     for (let idx = 0; idx < dataList.length; idx++) {
         const chunk = dataList[idx]
         let endChunk = chunk.start + chunk.duration
-        // if (songPosition > beat.start && position < endBeat) {
         if (songPosition < endChunk) {
             return idx + 1
         } else {
