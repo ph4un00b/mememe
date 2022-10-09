@@ -30,8 +30,11 @@ let segment = 0
 let section = 0
 
 const log = (text, extra = []) => {
-    return
+    let style = Style.base.join(';') + ';'
+    style += extra.join(';') // Add any additional styles
+    console.log(`%c${text}`, style)
 }
+
 
 export function useMotions(
     adjusted_particles: R.MutableRefObject<number>,
