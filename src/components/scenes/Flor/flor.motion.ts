@@ -7,9 +7,11 @@ import {
     useDebugParticles,
     useDebugSections,
     useDebugSegments,
+    useSongPosition,
 } from '@/helpers/store'
-import { useAudioPosition } from 'react-use-audio-player'
+import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../../../music/florecer.json'
+import { useEventListener } from '@/utils/hooks'
 
 const Style = {
     base: [
@@ -28,9 +30,7 @@ let segment = 0
 let section = 0
 
 const log = (text, extra = []) => {
-    let style = Style.base.join(';') + ';'
-    style += extra.join(';') // Add any additional styles
-    console.log(`%c${text}`, style)
+    return
 }
 
 export function useMotions(
@@ -51,6 +51,7 @@ export function useMotions(
     >
 ) {
     let data = R.useRef<MusicAnalysis>(window.structuredClone(florecerData))
+    let currentBeat = R.useRef(data.current.beats[0])
 
     const { percentComplete, duration, seek, position } = useAudioPosition({
         highRefreshRate: true,
@@ -76,18 +77,36 @@ export function useMotions(
 
     const inBeatEffect = R.useRef(false)
 
+    // const { playing } = useAudioPlayer()
+
+    // const [songPosition] = useSongPosition()
+    // R.useEffect(() => {
+    //     console.log('change', songPosition)
+    //     const next = nextBeat(position)
+    //     console.log('next', next)
+    //     // console.log('pos', beat)
+    //     currentBeat.current = data.current.beats[next]
+    // }, [songPosition])
+
     F.useFrame((state) => {
+        // if (!(position > 0) /** started */ || !playing) {
         if (!(position > 0) /** started */) {
+            // log('not startted!!', styles[0 % 3])
+            // console.log(player)
             return
         }
 
-        let currentBeat = data.current.beats[0]
-        // console.log(currentBeat.start)
-        let currentBeatDuration = currentBeat.start + currentBeat.duration
-        let beatDelta = currentBeat.duration / 5 /** can be whatever */
+        let cBeat = currentBeat.current
+        let currentBeatDuration = cBeat.start + cBeat.duration
+        let beatDelta = cBeat.duration / 5 /** can be whatever */
+        log(
+            `frame -ENTER ${beat} - start ${cBeat.start} - end ${currentBeatDuration}`,
+            styles[1 % 3]
+        )
 
         if (!inBeatEffect.current) {
-            if (position > currentBeat.start && position < currentBeatDuration) {
+            log(`frame -!inBeatEffect.current - pos: ${position}`, styles[2])
+            if (position > cBeat.start && position < currentBeatDuration) {
                 log('beat', styles[beat % 3])
                 // console.log({ start: currentBeat.start, delta: beatDelta, next: currentBeat.start + currentBeat.duration })
                 inBeatEffect.current = true
@@ -95,7 +114,7 @@ export function useMotions(
                 // changeDebugBeats(currentBeat.confidence)
                 // console.log({ particles: adjusted_particles.current })
 
-                if (currentBeat.confidence >= 0.4) {
+                if (cBeat.confidence >= 0.4) {
                     const newParticles = Math.floor(
                         Math.random() * 0.2 * adjusted_particles.current
                     )
@@ -104,29 +123,34 @@ export function useMotions(
                     Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
                 }
 
-                if (currentBeat.confidence < 0.4) {
+                if (cBeat.confidence < 0.4) {
                     points.current.rotateX(0.5)
                     points.current.rotateY(0.5)
                 }
             }
         }
 
-        if (currentBeat.confidence < 0.4) {
+        if (cBeat.confidence < 0.4) {
             camera.rotateZ(state.clock.elapsedTime * 0.5)
         }
 
         if (inBeatEffect.current) {
+            log('frame -inBeatEffect.current', styles[3 % 3])
             if (position > currentBeatDuration - 2 * beatDelta) {
-                inBeatEffect.current = false
                 const newParticles = 1 * adjusted_particles.current
                 changeDebugParticles(newParticles)
                 Lset({ particles: newParticles })
                 Lset({ leverCrazy: 2 * 0.45 + Math.random() })
 
-                console.log('pos', newBeats(position))
-                data.current.beats.splice(0, 1)
+                const next = nextBeat(position)
+                console.log('next', next)
+                // console.log('pos', beat)
+                currentBeat.current = data.current.beats[next]
+                inBeatEffect.current = false
             }
         }
+
+        log(`frame -END ${beat}`, styles[4 % 3])
     })
 
     const inSectionEffect = R.useRef(false)
@@ -134,17 +158,23 @@ export function useMotions(
     F.useFrame((state) => {
         if (!(position > 0) /** started */) return
 
-        let cSectionDuration = data.current.sections[0].start + data.current.sections[0].duration
-        let sectionDelta = data.current.sections[0].duration / 5 /** can be whatever */
+        let cSectionDuration =
+            data.current.sections[0].start + data.current.sections[0].duration
+        let sectionDelta =
+            data.current.sections[0].duration / 5 /** can be whatever */
 
         if (!inSectionEffect.current) {
-            if (position > data.current.sections[0].start && position < cSectionDuration) {
+            if (
+                position > data.current.sections[0].start &&
+                position < cSectionDuration
+            ) {
                 log('sections', styles[section % 3])
                 changeDebugSections(data.current.sections[0].confidence)
                 console.log({
                     start: data.current.sections[0].start,
                     delta: sectionDelta,
-                    next: data.current.sections[0].start + data.current.sections[0].duration,
+                    next:
+                        data.current.sections[0].start + data.current.sections[0].duration,
                 })
                 inSectionEffect.current = true
                 section++
@@ -360,15 +390,16 @@ export interface Tatum {
     confidence: number
 }
 
-function newBeats(position: number): number {
+function nextBeat(position: number): number {
+    console.log(position)
     for (let idx = 0; idx < florecerData.beats.length; idx++) {
         const beat = florecerData.beats[idx]
-
-        let beatDuration = beat.start + beat.duration
-
-        if (position > beat.start && position < beatDuration) {
+        let endBeat = beat.start + beat.duration
+        // if (position > beat.start && position < endBeat) {
+        if (position < endBeat) {
             return idx + 1
         } else {
+            // console.log(beat.start)
             continue
         }
     }

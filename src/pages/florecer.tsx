@@ -7,12 +7,13 @@ import { Leva } from 'leva'
 import * as hooks from '@/utils/hooks'
 import * as R from 'react'
 import * as browser from '@/utils/browser'
-import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
+import { AudioPlayerControls, useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
 import {
     useDebugBeats,
     useDebugParticles,
     useDebugSections,
     useDebugSegments,
+    useSongPosition,
 } from '@/helpers/store'
 import { IfFeatureEnabled } from '@growthbook/growthbook-react'
 import florecerData from '../music/florecer.json'
@@ -25,12 +26,18 @@ let baseUrl = 'https://ph4un00b.github.io/data'
 function Page(props) {
     const [collapsed, setCollapsed] = R.useState(true)
 
+    const [, changePosition] = useSongPosition()
+
     const { togglePlayPause, ready, loading, playing } = useAudioPlayer({
         src: `${baseUrl}/florecer/source.mus`,
         format: 'mp3',
         autoplay: false,
         html5: false,
         onend: () => console.log('sound has ended!'),
+        // onseek: (e) => {
+        //     console.log('cambiar!!')
+
+        // }
     })
 
     const { percentComplete, duration, seek } = useAudioPosition({ highRefreshRate: true })
@@ -67,25 +74,26 @@ function Page(props) {
                 >
                     {!ready && !loading ? 'Loading' : 'Play'}
                 </button>
-                <IfFeatureEnabled feature='florecer-debug'>
-                    <br />
-                    <span>beats: {dbeats}</span>
-                    <br />
-                    <span>particles: {dparticles}</span>
-                    {/* <br />
+                {/* <IfFeatureEnabled feature='florecer-debug'> */}
+                <br />
+                <span>beats: {dbeats}</span>
+                <br />
+                <span>particles: {dparticles}</span>
+                {/* <br />
                     <span>segments: {dsegments}</span> */}
-                    <br />
-                    <span>sections: {dsection}</span>
-                    {florecerData.sections.map((section, idx) => {
-                        return (
-                            <button onClick={() => {
-                                seek(section.start)
-                            }} className='cyberpunk' key={idx}>
-                                sec-{idx}, {section.confidence}
-                            </button>
-                        )
-                    })}
-                </IfFeatureEnabled>
+                <br />
+                <span>sections: {dsection}</span>
+                {florecerData.sections.map((section, idx) => {
+                    return (
+                        <button onClick={() => {
+                            seek(section.start)
+                            // changePosition(section.start)
+                        }} className='cyberpunk' key={idx}>
+                            sec-{idx}, {section.confidence}
+                        </button>
+                    )
+                })}
+                {/* </IfFeatureEnabled> */}
             </div>
             <Leva
                 collapsed={{
