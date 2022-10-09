@@ -70,9 +70,9 @@ function Page(props) {
                     {!ready && !loading ? 'Loading' : 'Play'}
                 </button>
 
-                <IfFeatureEnabled feature='florecer-debug'>
-                    <Debug />
-                </IfFeatureEnabled>
+                {/* <IfFeatureEnabled feature='florecer-debug'> */}
+                <Debug />
+                {/* </IfFeatureEnabled> */}
             </div>
             <Leva
                 collapsed={{

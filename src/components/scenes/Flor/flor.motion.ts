@@ -36,7 +36,6 @@ const log = (text, extra = []) => {
     console.log(`%c${text}`, style)
 }
 
-
 export function useMotions(
     adjusted_particles: R.MutableRefObject<number>,
     Lset: (value: {
@@ -55,18 +54,16 @@ export function useMotions(
     >
 ) {
     // let data = R.useRef<MusicAnalysis>(window.structuredClone(florecerData))
-    let data = R.useMemo(
+    let analysis = R.useMemo(
         () => window.structuredClone(florecerData) as MusicAnalysis,
         []
     )
-    let currentBeat = R.useRef(data.beats[0])
+    let currentBeat = R.useRef(analysis.beats[0])
 
     const { percentComplete, duration, seek, position } = useAudioPosition({
         highRefreshRate: true,
     })
 
-    const [, changeDebugBeats] = useDebugBeats()
-    const [, changeDebugParticles] = useDebugParticles()
 
     const { camera } = F.useThree()
 
@@ -84,13 +81,17 @@ export function useMotions(
         )
     })
 
+
     const inBeatEffect = R.useRef(false)
     const { playing } = useAudioPlayer()
 
     const [songPosition] = useSongPosition()
+    const [, changeDebugBeats] = useDebugBeats()
+    const [, changeDebugParticles] = useDebugParticles()
+
     R.useEffect(() => {
-        const next = nextBeat(position)
-        currentBeat.current = data.beats[next]
+        const next = nextChunk({ songPosition: position, type: 'beats' })
+        currentBeat.current = analysis['beats'][next]
     }, [songPosition])
 
     F.useFrame((state) => {
@@ -143,26 +144,31 @@ export function useMotions(
                 Lset({ particles: newParticles })
                 Lset({ leverCrazy: 2 * 0.45 + Math.random() })
 
-                const next = nextBeat(position)
-                // console.log('next', next)
+                const next = nextChunk({ songPosition: position, type: 'beats' })
+                currentBeat.current = analysis['beats'][next]
+
                 changeDebugBeats(next)
-                currentBeat.current = data.beats[next]
                 inBeatEffect.current = false
             }
         }
 
         // log(`frame -END ${beat}`, styles[4 % 3])
     })
-
 }
 
-function nextBeat(position: number): number {
-    // console.log(position)
-    for (let idx = 0; idx < florecerData.beats.length; idx++) {
-        const beat = florecerData.beats[idx]
-        let endBeat = beat.start + beat.duration
-        // if (position > beat.start && position < endBeat) {
-        if (position < endBeat) {
+function nextChunk({
+    songPosition,
+    type,
+}: {
+    songPosition: number
+    type: 'beats' | 'sections'
+}): number {
+    const dataList = florecerData[type]
+    for (let idx = 0; idx < dataList.length; idx++) {
+        const chunk = dataList[idx]
+        let endChunk = chunk.start + chunk.duration
+        // if (songPosition > beat.start && position < endBeat) {
+        if (songPosition < endChunk) {
             return idx + 1
         } else {
             // console.log(beat.start)
@@ -170,7 +176,6 @@ function nextBeat(position: number): number {
         }
     }
 }
-
 
 export interface MusicAnalysis {
     meta: Meta
