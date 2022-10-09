@@ -11,7 +11,6 @@ import {
 } from '@/helpers/store'
 import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../../../music/florecer.json'
-import { useEventListener } from '@/utils/hooks'
 
 const Style = {
     base: [
@@ -20,14 +19,12 @@ const Style = {
         'padding: 2px 4px',
         'border-radius: 2px',
     ],
-    warning: ['color: #eee', 'background-color: red'],
-    success: ['background-color: green'],
+    warning: ['color: #eee', 'background-color: #aa0000'],
+    success: ['background-color: #00bb88'],
 }
 
 const styles = [Style.base, Style.warning, Style.success]
-let beat = 0
-let segment = 0
-let section = 0
+let chunkCounter = 0
 
 const log = (text, extra = []) => {
     let style = Style.base.join(';') + ';'
@@ -36,62 +33,35 @@ const log = (text, extra = []) => {
     console.log(`%c${text}`, style)
 }
 
+type ParamsProps = {
+  /** @todo make always available?*/ next?: number
+    chunk: Beat | Section
+    state: F.RootState
+}
+
 export function useMotions(
-    adjusted_particles: R.MutableRefObject<number>,
-    Lset: (value: {
-        leverA?: number
-        offset?: number
-        leverC?: number
-        particles?: number
-        leverCrazy?: number
-        leverD?: number
-        leverE?: number
-        leverR?: number
-        leverR2?: number
-    }) => void,
-    points: R.MutableRefObject<
-        T.Points<T.BufferGeometry, T.Material | T.Material[]>
-    >
+    inactiveCallback: (params: ParamsProps) => void,
+    activeCallback: (params: ParamsProps) => void,
+    frameCallback: (params: ParamsProps) => void,
+    { type }: { type: 'beats' | 'sections' }
 ) {
     // let data = R.useRef<MusicAnalysis>(window.structuredClone(florecerData))
     let analysis = R.useMemo(
         () => window.structuredClone(florecerData) as MusicAnalysis,
         []
     )
-    let currentBeat = R.useRef(analysis.beats[0])
-
-    const { percentComplete, duration, seek, position } = useAudioPosition({
+    let currentChunk = R.useRef(analysis.beats[0])
+    const { position } = useAudioPosition({
         highRefreshRate: true,
     })
 
-
-    const { camera } = F.useThree()
-
-    F.useFrame((state) => {
-        if (!(position > 0) /** started */) {
-            return
-        }
-        // wtf nice ( •_•)>⌐■-■
-        camera.position.z = Math.cos(
-            camera.position.z + state.clock.elapsedTime * 0.1
-        )
-
-        camera.position.x = Math.sin(
-            camera.position.x + state.clock.elapsedTime * 0.1
-        )
-    })
-
-
-    const inBeatEffect = R.useRef(false)
+    const inMotion = R.useRef(false)
     const { playing } = useAudioPlayer()
-
     const [songPosition] = useSongPosition()
-    const [, changeDebugBeats] = useDebugBeats()
-    const [, changeDebugParticles] = useDebugParticles()
 
     R.useEffect(() => {
-        const next = nextChunk({ songPosition: position, type: 'beats' })
-        currentBeat.current = analysis['beats'][next]
+        const next = nextChunk({ songPosition: position, type })
+        currentChunk.current = analysis[type][next]
     }, [songPosition])
 
     F.useFrame((state) => {
@@ -99,56 +69,38 @@ export function useMotions(
             return
         }
 
-        let cBeat = currentBeat.current
-        let currentBeatDuration = cBeat.start + cBeat.duration
-        let beatDelta = cBeat.duration / 5 /** can be whatever */
+        let cChunk = currentChunk.current
+        let cEnd = cChunk.start + cChunk.duration
+        let cDelta = cChunk.duration / 5 /** can be whatever */
         // log(
         //     `frame -ENTER ${beat} - start ${cBeat.start} - end ${currentBeatDuration}`,
         //     styles[1 % 3]
         // )
 
-        if (!inBeatEffect.current) {
+        if (!inMotion.current) {
             // log(`frame -!inBeatEffect.current - pos: ${position}`, styles[2])
-            if (position > cBeat.start && position < currentBeatDuration) {
-                log('beat', styles[beat % 3])
+            if (position > cChunk.start && position < cEnd) {
+                log(type, styles[chunkCounter % 3])
                 // console.log({ start: currentBeat.start, delta: beatDelta, next: currentBeat.start + currentBeat.duration })
-                inBeatEffect.current = true
-                beat++
+                inMotion.current = true
+                chunkCounter++
                 // changeDebugBeats(currentBeat.confidence)
-
-                if (cBeat.confidence >= 0.4) {
-                    const newParticles = Math.floor(
-                        Math.random() * 0.2 * adjusted_particles.current
-                    )
-                    changeDebugParticles(newParticles)
-                    Lset({ particles: newParticles })
-                    Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
-                }
-
-                if (cBeat.confidence < 0.4) {
-                    points.current.rotateX(0.5)
-                    points.current.rotateY(0.5)
-                }
+                // todo: better name
+                activeCallback({ chunk: cChunk, state })
             }
         }
 
-        if (cBeat.confidence < 0.4) {
-            camera.rotateZ(state.clock.elapsedTime * 0.5)
-        }
+        frameCallback({ chunk: cChunk, state })
 
-        if (inBeatEffect.current) {
+        if (inMotion.current) {
             // log('frame -inBeatEffect.current', styles[3 % 3])
-            if (position > currentBeatDuration - 2 * beatDelta) {
-                const newParticles = 1 * adjusted_particles.current
-                changeDebugParticles(newParticles)
-                Lset({ particles: newParticles })
-                Lset({ leverCrazy: 2 * 0.45 + Math.random() })
+            if (position > cEnd - 2 * cDelta) {
+                // todo: better name
+                const next = nextChunk({ songPosition: position, type })
+                currentChunk.current = analysis[type][next]
 
-                const next = nextChunk({ songPosition: position, type: 'beats' })
-                currentBeat.current = analysis['beats'][next]
-
-                changeDebugBeats(next)
-                inBeatEffect.current = false
+                inactiveCallback({ next, chunk: cChunk, state })
+                inMotion.current = false
             }
         }
 

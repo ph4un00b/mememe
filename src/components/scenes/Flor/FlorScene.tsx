@@ -10,6 +10,8 @@ import vertexShader from './flor.vertex.glsl'
 import { fragmentShader } from './flor.frag'
 import { florAttributes } from './flor.attr'
 import { useMotions } from './flor.motion'
+import { useDebugBeats, useDebugParticles } from '@/helpers/store'
+import { useAudioPosition } from 'react-use-audio-player'
 
 export default function FlorScene() {
     let adjustedParticles = R.useRef(browser.isMobile() ? 20_000 : 70_000)
@@ -82,7 +84,60 @@ export default function FlorScene() {
         shader.uniforms.uTime.value = time
     })
 
-    useMotions(adjustedParticles, Lset, points)
+    const [, changeDebugBeats] = useDebugBeats()
+    const [, changeDebugParticles] = useDebugParticles()
+
+    const { camera } = F.useThree()
+
+    const { position } = useAudioPosition({
+        highRefreshRate: true,
+    })
+
+    F.useFrame((state) => {
+        if (!(position > 0) /** started */) {
+            return
+        }
+        // wtf nice ( •_•)>⌐■-■
+        camera.position.z = Math.cos(
+            camera.position.z + state.clock.elapsedTime * 0.1
+        )
+
+        camera.position.x = Math.sin(
+            camera.position.x + state.clock.elapsedTime * 0.1
+        )
+    })
+
+    useMotions(
+        function inactiveCallback({ next }) {
+            const newParticles = 1 * adjustedParticles.current
+            changeDebugParticles(newParticles)
+            Lset({ particles: newParticles })
+            Lset({ leverCrazy: 2 * 0.45 + Math.random() })
+            changeDebugBeats(next)
+        },
+        function activeCallback({ chunk }) {
+            if (chunk.confidence >= 0.4) {
+                const newParticles = Math.floor(
+                    Math.random() * 0.2 * adjustedParticles.current
+                )
+
+                changeDebugParticles(newParticles)
+                Lset({ particles: newParticles })
+                Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
+            }
+
+            if (chunk.confidence < 0.4) {
+                points.current.rotateX(0.5)
+                points.current.rotateY(0.5)
+            }
+        },
+        function frameCallback({ chunk, state }) {
+            if (chunk.confidence < 0.4) {
+                camera.rotateZ(state.clock.elapsedTime * 0.5)
+            }
+        },
+        { type: 'beats' }
+    )
 
     return (
         <points
@@ -121,4 +176,3 @@ export default function FlorScene() {
         </points>
     )
 }
-
