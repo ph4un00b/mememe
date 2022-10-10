@@ -53,7 +53,7 @@ export function useMotions(
         if ('structuredClone' in window) {
             return window.structuredClone(florecerData) as MusicAnalysis
         }
-        /** fallback */
+        /** mostly ios fallback */
         X.log.debug('🌸', {
             sopa: '📛⛑ falling from structuredClone',
             agent: window.navigator.userAgent,
@@ -72,6 +72,10 @@ export function useMotions(
     R.useEffect(() => {
         const index = currentChunkIndex({ songPosition, type })
         currentChunk.current = [index, analysis[type][index]]
+        /** the intention is to force enterCallback
+         * @todo find a better way?
+         */
+        inMotion.current = false
     }, [newPosition])
 
     F.useFrame((state) => {
@@ -79,6 +83,8 @@ export function useMotions(
             return
         }
         let [, cChunk] = currentChunk.current
+        if (!cChunk /** was last chunk */) return
+
         let cEnd = cChunk.start + cChunk.duration
         let cDelta = cChunk.duration / 5 /** can be whatever */
 
@@ -89,12 +95,11 @@ export function useMotions(
                     `${type} - ${currentChunk.current[0]}`,
                     styles[currentChunk.current[0] % 3]
                 )
-                // todo: better name
                 enterCallback({ chunk: cChunk, state, current: currentChunk.current })
             }
         } else {
-            if (songPosition > cEnd - 2 * cDelta) {
-                // todo: better name
+            const threshold = cEnd - 2 * cDelta
+            if (songPosition > threshold) {
                 const index = currentChunkIndex({ songPosition, type })
                 currentChunk.current = [index + 1, analysis[type][index + 1]]
                 leavingCallback({
