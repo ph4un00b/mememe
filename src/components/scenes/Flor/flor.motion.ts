@@ -10,6 +10,7 @@ import {
 } from '@/helpers/store'
 import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../../../music/florecer.json'
+import { TubePainter } from 'three-stdlib'
 
 const Style = {
     base: [
@@ -19,7 +20,7 @@ const Style = {
         'border-radius: 2px',
     ],
     warning: ['color: #eee', 'background-color: #aa0000'],
-    success: ['background-color: #00bb88'],
+    success: ['background-color: #00bb44'],
 }
 
 const styles = [Style.base, Style.warning, Style.success]
@@ -34,7 +35,7 @@ const log = (text, extra = []) => {
 
 type ParamsProps = {
   /** @todo make always available?*/ next?: number
-    current?: number
+    current?: [number, Beat | Section]
     chunk: Beat | Section
     state: F.RootState
 }
@@ -43,75 +44,59 @@ export function useMotions(
     { type }: { type: 'beats' | 'sections' },
     inactiveCallback: (params: ParamsProps) => void,
     activeCallback: (params: ParamsProps) => void,
-    frameCallback: (params: ParamsProps) => void,
+    frameCallback: (params: ParamsProps) => void
 ) {
     // let data = R.useRef<MusicAnalysis>(window.structuredClone(florecerData))
     let analysis = R.useMemo(
         () => window.structuredClone(florecerData) as MusicAnalysis,
         []
     )
-    let currentChunk = R.useRef(analysis.beats[0])
+    let currentChunk = R.useRef<[number, Beat | Section]>([0, analysis[type][0]])
     let currentIndex = R.useRef(0)
-    const { position } = useAudioPosition({
-        highRefreshRate: true,
-    })
 
     const inMotion = R.useRef(false)
     const { playing } = useAudioPlayer()
     const [songPosition] = useSongPosition()
+    const { position } = useAudioPosition({
+        highRefreshRate: true,
+    })
 
     R.useEffect(() => {
-        const index = nextChunkIndex({ songPosition: position, type })
-        currentChunk.current = analysis[type][index]
-        currentIndex.current = index
+        const index = currentChunkIndex({ songPosition: position, type })
+        currentChunk.current = [index, analysis[type][index]]
     }, [songPosition])
 
     F.useFrame((state) => {
         if (!(position > 0) /** started */ || !playing) {
             return
         }
-
-        let cChunk = currentChunk.current
+        let [, cChunk] = currentChunk.current
         let cEnd = cChunk.start + cChunk.duration
         let cDelta = cChunk.duration / 5 /** can be whatever */
-        // log(
-        //     `frame -ENTER ${beat} - start ${cBeat.start} - end ${currentBeatDuration}`,
-        //     styles[1 % 3]
-        // )
 
         if (!inMotion.current) {
-            // log(`frame -!inBeatEffect.current - pos: ${position}`, styles[2])
             if (position > cChunk.start && position < cEnd) {
-                log(type, styles[chunkCounter % 3])
-                // console.log({ start: currentBeat.start, delta: beatDelta, next: currentBeat.start + currentBeat.duration })
                 inMotion.current = true
-                chunkCounter++
-                // changeDebugBeats(currentBeat.confidence)
+                log(`${type} - ${currentIndex.current}`, styles[chunkCounter % 3])
                 // todo: better name
-                activeCallback({ chunk: cChunk, state })
+                activeCallback({ chunk: cChunk, state, current: currentChunk.current })
             }
-        }
-
-        frameCallback({ chunk: cChunk, state, current: currentIndex.current })
-
-        if (inMotion.current) {
-            // log('frame -inBeatEffect.current', styles[3 % 3])
+        } else {
             if (position > cEnd - 2 * cDelta) {
                 // todo: better name
-                const index = nextChunkIndex({ songPosition: position, type })
-                currentIndex.current = index
-                currentChunk.current = analysis[type][index]
-
+                const index = currentChunkIndex({ songPosition: position, type })
+                currentChunk.current = [index + 1, analysis[type][index + 1]]
                 inactiveCallback({ next: index, chunk: cChunk, state })
                 inMotion.current = false
             }
         }
 
+        frameCallback({ chunk: cChunk, state, current: currentChunk.current })
         // log(`frame -END ${beat}`, styles[4 % 3])
     })
 }
 
-function nextChunkIndex({
+function currentChunkIndex({
     songPosition,
     type,
 }: {
@@ -123,7 +108,8 @@ function nextChunkIndex({
         const chunk = dataList[idx]
         let endChunk = chunk.start + chunk.duration
         if (songPosition < endChunk) {
-            return idx + 1
+            // return idx + 1
+            return idx
         } else {
             // console.log(beat.start)
             continue
