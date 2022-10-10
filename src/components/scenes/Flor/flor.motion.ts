@@ -60,23 +60,22 @@ export function useMotions(
         })
         return clone(florecerData) as MusicAnalysis
     }, [])
-    let currentChunk = R.useRef<[number, Beat | Section]>([0, analysis[type][0]])
-    let currentIndex = R.useRef(0)
 
     const inMotion = R.useRef(false)
-    const { playing } = useAudioPlayer()
-    const [songPosition] = useSongPosition()
-    const { position } = useAudioPosition({
+    const [newPosition] = useSongPosition()
+    const { playing: songPlaying } = useAudioPlayer()
+    const { position: songPosition } = useAudioPosition({
         highRefreshRate: true,
     })
+    let currentChunk = R.useRef<[number, Beat | Section]>([0, analysis[type][0]])
 
     R.useEffect(() => {
-        const index = currentChunkIndex({ songPosition: position, type })
+        const index = currentChunkIndex({ songPosition, type })
         currentChunk.current = [index, analysis[type][index]]
-    }, [songPosition])
+    }, [newPosition])
 
     F.useFrame((state) => {
-        if (!(position > 0) /** started */ || !playing) {
+        if (!(songPosition > 0) || !songPlaying) {
             return
         }
         let [, cChunk] = currentChunk.current
@@ -84,7 +83,7 @@ export function useMotions(
         let cDelta = cChunk.duration / 5 /** can be whatever */
 
         if (!inMotion.current) {
-            if (position > cChunk.start && position < cEnd) {
+            if (songPosition > cChunk.start && songPosition < cEnd) {
                 inMotion.current = true
                 log(
                     `${type} - ${currentChunk.current[0]}`,
@@ -94,12 +93,12 @@ export function useMotions(
                 enterCallback({ chunk: cChunk, state, current: currentChunk.current })
             }
         } else {
-            if (position > cEnd - 2 * cDelta) {
+            if (songPosition > cEnd - 2 * cDelta) {
                 // todo: better name
-                const index = currentChunkIndex({ songPosition: position, type })
+                const index = currentChunkIndex({ songPosition, type })
                 currentChunk.current = [index + 1, analysis[type][index + 1]]
                 leavingCallback({
-                    next: index,
+                    next: index + 1,
                     chunk: cChunk,
                     state,
                     current: currentChunk.current,
