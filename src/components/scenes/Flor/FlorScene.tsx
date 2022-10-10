@@ -97,60 +97,66 @@ export default function FlorScene() {
         if (!(position > 0) /** started */) {
             return
         }
-        // wtf nice ( •_•)>⌐■-■
-        camera.position.z = Math.cos(
-            // camera.position.z + state.clock.elapsedTime * 0.1 
-            camera.position.z + state.clock.elapsedTime * 4
-        )
+
 
         // camera.position.x = Math.sin(
         //     camera.position.x + state.clock.elapsedTime * 0.1
         // )
     })
 
-    useMotions(
-        { type: 'beats' },
-        function inactiveCallback({ next }) {
-            const newParticles = 1 * adjustedParticles.current
-            // changeDebugParticles(newParticles)
-            changeDebugBeats(camera.position.z)
-            // Lset({ particles: newParticles })
-            // Lset({ leverCrazy: 2 * 0.45 + Math.random() })
-        },
-        function activeCallback({ chunk }) {
-            if (chunk.confidence >= 0.4) {
-                // const newParticles = Math.floor(
-                //     Math.random() * 0.2 * adjustedParticles.current
-                // )
+    // useMotions(
+    //     { type: 'beats' },
+    //     function leavingCallback({ next }) {
+    //         const newParticles = 1 * adjustedParticles.current
+    //         // changeDebugParticles(newParticles)
+    //         changeDebugBeats(camera.position.z)
+    //         // Lset({ particles: newParticles })
+    //         // Lset({ leverCrazy: 2 * 0.45 + Math.random() })
+    //     },
+    //     function enterCallback({ chunk, current }) {
+    //         console.log('frame', current)
+    //         if (chunk.confidence >= 0.4) {
+    //             // const newParticles = Math.floor(
+    //             //     Math.random() * 0.2 * adjustedParticles.current
+    //             // )
 
-                // changeDebugParticles(newParticles)
-                // Lset({ particles: newParticles })
-                // Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
-            }
+    //             // changeDebugParticles(newParticles)
+    //             // Lset({ particles: newParticles })
+    //             // Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
+    //         }
 
-            if (chunk.confidence < 0.4) {
-                // points.current.rotateX(0.5)
-                // points.current.rotateY(0.5)
-            }
-        },
-        function frameCallback({ chunk, state, current }) {
-            // console.log('frame', current)
-            if (chunk.confidence < 0.4) {
-                // camera.rotateZ(state.clock.elapsedTime * 0.5)
-            }
-        }
-    )
+    //         if (chunk.confidence < 0.4) {
+    //             // points.current.rotateX(0.5)
+    //             // points.current.rotateY(0.5)
+    //         }
+    //     },
+    //     function frameCallback({ chunk, state, current }) {
+    //         if (chunk.confidence < 0.4) {
+    //             // camera.rotateZ(state.clock.elapsedTime * 0.5)
+    //         }
+    //     }
+    // )
 
     useMotions(
         { type: 'sections' },
-        function inactiveCallback({ next }) {
-
+        function leavingCallback({ next, current }) {
+            console.log('leavingCallback', current)
         },
-        function activeCallback({ chunk }) {
+        function enterCallback({ chunk, state, current }) {
+
+            console.log('enterCallback', current)
 
         },
         function frameCallback({ chunk, state, current }) {
-            console.log('frame', current)
+            const [index] = current
+            changeDebugBeats(camera.position.z)
+
+            // wtf nice ( •_•)>⌐■-■
+            camera.position.z = Math.cos(
+                // camera.position.z + state.clock.elapsedTime * 0.1
+                camera.position.z + state.clock.elapsedTime * index
+            )
+            // console.log('frameCallback', current)
         }
     )
 

@@ -21,6 +21,7 @@ const Style = {
     ],
     warning: ['color: #eee', 'background-color: #aa0000'],
     success: ['background-color: #00bb44'],
+    seek: ['background-color: #ff44ff']
 }
 
 const styles = [Style.base, Style.warning, Style.success]
@@ -42,8 +43,8 @@ type ParamsProps = {
 
 export function useMotions(
     { type }: { type: 'beats' | 'sections' },
-    inactiveCallback: (params: ParamsProps) => void,
-    activeCallback: (params: ParamsProps) => void,
+    leavingCallback: (params: ParamsProps) => void,
+    enterCallback: (params: ParamsProps) => void,
     frameCallback: (params: ParamsProps) => void
 ) {
     // let data = R.useRef<MusicAnalysis>(window.structuredClone(florecerData))
@@ -77,22 +78,26 @@ export function useMotions(
         if (!inMotion.current) {
             if (position > cChunk.start && position < cEnd) {
                 inMotion.current = true
-                log(`${type} - ${currentIndex.current}`, styles[chunkCounter % 3])
+                log(`${type} - ${currentChunk.current[0]}`, styles[currentChunk.current[0] % 3])
                 // todo: better name
-                activeCallback({ chunk: cChunk, state, current: currentChunk.current })
+                enterCallback({ chunk: cChunk, state, current: currentChunk.current })
             }
         } else {
             if (position > cEnd - 2 * cDelta) {
                 // todo: better name
                 const index = currentChunkIndex({ songPosition: position, type })
                 currentChunk.current = [index + 1, analysis[type][index + 1]]
-                inactiveCallback({ next: index, chunk: cChunk, state })
+                leavingCallback({
+                    next: index,
+                    chunk: cChunk,
+                    state,
+                    current: currentChunk.current,
+                })
                 inMotion.current = false
             }
         }
 
         frameCallback({ chunk: cChunk, state, current: currentChunk.current })
-        // log(`frame -END ${beat}`, styles[4 % 3])
     })
 }
 
