@@ -40,11 +40,12 @@ type ParamsProps = {
     current?: [number, Beat | Section]
     chunk: Beat | Section
     state: F.RootState
+    event?: 'entering' | 'leaving'
 }
 
 export function useMotions(
     { type }: { type: 'beats' | 'sections' },
-    leavingCallback: (params: ParamsProps) => void,
+    beforeLeaveCallback: (params: ParamsProps) => void,
     enterCallback: (params: ParamsProps) => void,
     frameCallback: (params: ParamsProps) => void
 ) {
@@ -75,7 +76,7 @@ export function useMotions(
         /** the intention is to force enterCallback
          * @todo find a better way?
          */
-        inMotion.current = false
+        // inMotion.current = false
     }, [newPosition])
 
     F.useFrame((state) => {
@@ -95,6 +96,7 @@ export function useMotions(
                     `${type} - ${currentChunk.current[0]}`,
                     styles[currentChunk.current[0] % 3]
                 )
+
                 enterCallback({ chunk: cChunk, state, current: currentChunk.current })
             }
         } else {
@@ -102,7 +104,7 @@ export function useMotions(
             if (songPosition > threshold) {
                 const index = currentChunkIndex({ songPosition, type })
                 currentChunk.current = [index + 1, analysis[type][index + 1]]
-                leavingCallback({
+                beforeLeaveCallback({
                     next: index + 1,
                     chunk: cChunk,
                     state,
@@ -112,7 +114,12 @@ export function useMotions(
             }
         }
 
-        frameCallback({ chunk: cChunk, state, current: currentChunk.current })
+        frameCallback({
+            chunk: cChunk,
+            state,
+            current: currentChunk.current,
+            event: inMotion.current ? 'entering' : 'leaving',
+        })
     })
 }
 

@@ -93,7 +93,7 @@ Page.r3f = function (props) {
                 position={[0, 0, 1]}
                 fov={75}
                 // auto updates the viewport
-                manual={false} //todo: how this affect? se pierde la relacion cuadrada
+                manual={false} //todo: how this boolean affect? parece que se pierde la relacion cuadrada
                 makeDefault={true}
             />
 
