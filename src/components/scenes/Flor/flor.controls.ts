@@ -1,4 +1,6 @@
 import { MutableRefObject } from 'react'
+import * as R from 'react'
+import * as browser from '@/utils/browser'
 
 export function florControls(adjusted_particles: MutableRefObject<number>): {
     leverA: { value: number; min: number; max: number; step: number }
@@ -12,7 +14,12 @@ export function florControls(adjusted_particles: MutableRefObject<number>): {
     particles: { value: number; min: number; max: number }
 } {
     return {
-        leverA: { value: 0.65, min: 0, max: 2, step: 0.01 },
+        leverA: {
+            value: 0.65,
+            min: 0,
+            max: browser.isMobile() ? 0.65 : 70_000,
+            step: 0.01,
+        },
         offset: { value: 0.0, min: 0, max: 1, step: 0.01 },
         leverC: { value: 1, min: 1, max: 20, step: 1 },
         leverD: { value: 17, min: 0, max: 20, step: 1 },
@@ -23,7 +30,7 @@ export function florControls(adjusted_particles: MutableRefObject<number>): {
         particles: {
             value: adjusted_particles.current,
             min: 0,
-            max: 100000,
+            max: adjusted_particles.current,
         },
     }
 }

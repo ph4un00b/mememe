@@ -15,6 +15,10 @@ import { useAudioPosition } from 'react-use-audio-player'
 
 export default function FlorScene() {
     let adjustedParticles = R.useRef(browser.isMobile() ? 20_000 : 70_000)
+    let maxParticlesSmall = R.useRef(browser.isMobile() ? 4_000 /** +1000 */ : 70_000)
+    let maxASmall = R.useRef(browser.isMobile() ? 0.2 : 0.65)
+    let maxABig = R.useRef(browser.isMobile() ? 0.65 : 1)
+
     const geometry = R.useRef<T.BufferGeometry>(null!)
     const points = R.useRef<T.Points>(null!)
 
@@ -96,39 +100,45 @@ export default function FlorScene() {
     useMotions(
         { type: 'beats' },
         function leavingCallback({ next }) {
-            const newParticles = 0.5 * adjustedParticles.current
+            // const newParticles = 0.7 * adjustedParticles.current
+            const newParticles = 15_000
 
             // changeDebugBeats(camera.position.z)
             Lset({ particles: newParticles })
-            Lset({ leverCrazy: 2 * 0.45 + Math.random() })
+            Lset({ leverA: maxABig.current })
+            Lset({ leverCrazy: 0.5 * 0.45 + Math.random() })
         },
         function enterCallback({ chunk, current }) {
             if (chunk.confidence >= 0.4) {
 
                 const newParticles = Math.floor(
-                    Math.random() * 0.8 * adjustedParticles.current
+                    10_000 + Math.random() * maxParticlesSmall.current
                 )
 
                 // changeDebugParticles(newParticles)
                 Lset({ particles: newParticles })
+                Lset({ leverA: maxASmall.current })
                 Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
             }
 
 
         },
         function frameCallback({ chunk, state, current }) {
-            if (chunk.confidence < 0.4) {
-                points.current.rotateX(0.01)
-                points.current.rotateY(0.01)
-            }
+            // Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
+            // Lset({ leverCrazy: state.clock.elapsedTime * 0.1 })
+            // if (chunk.confidence < 0.4) {
+            points.current.rotateX(0.01)
+            points.current.rotateY(0.01)
+            // }
 
             if (chunk.confidence < 0.4) {
-                camera.rotateZ(state.clock.elapsedTime * 0.01)
+                camera.rotateZ(state.clock.elapsedTime * 0.1)
             }
         }
     )
 
     const group = R.useRef(null!)
+
     useMotions(
         { type: 'sections' },
         function beforeLeaveCallback({ next, current }) {
@@ -142,7 +152,6 @@ export default function FlorScene() {
             // changeDebugBeats(camera.position.z)
 
             if (index == 0 && event == 'entering') {
-                console.log(event)
                 /** acercarce */
                 camera.position.z = Math.cos(
                     camera.position.z + state.clock.elapsedTime * 0.05
@@ -156,7 +165,7 @@ export default function FlorScene() {
             }
 
             if (index >= 1 && index < 8 && event == 'entering') {
-                const velocity = mapRange(index, { iMin: 0, iMax: 7 }, { oMin: 0.1, oMax: 1 })
+                const velocity = mapRange(index, { iMin: 0, iMax: 7 }, { oMin: 0.1, oMax: 0.6 })
                 camera.position.z = Math.cos(
                     camera.position.z + state.clock.elapsedTime * velocity
                 )
@@ -166,7 +175,7 @@ export default function FlorScene() {
             }
 
             if (index >= 1 && index < 8 && event == 'leaving') {
-                const velocity = mapRange(index, { iMin: 0, iMax: 7 }, { oMin: 0.1, oMax: 1 })
+                const velocity = mapRange(index, { iMin: 0, iMax: 7 }, { oMin: 0.1, oMax: 0.6 })
                 camera.position.z = Math.cos(
                     camera.position.z + state.clock.elapsedTime * velocity
                 )
