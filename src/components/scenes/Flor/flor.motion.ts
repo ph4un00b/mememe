@@ -10,7 +10,8 @@ import {
 } from '@/helpers/store'
 import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../../../music/florecer.json'
-import { TubePainter } from 'three-stdlib'
+import clone from 'lodash.clone'
+import * as X from 'next-axiom'
 
 const Style = {
     base: [
@@ -21,7 +22,7 @@ const Style = {
     ],
     warning: ['color: #eee', 'background-color: #aa0000'],
     success: ['background-color: #00bb44'],
-    seek: ['background-color: #ff44ff']
+    seek: ['background-color: #ff44ff'],
 }
 
 const styles = [Style.base, Style.warning, Style.success]
@@ -48,10 +49,17 @@ export function useMotions(
     frameCallback: (params: ParamsProps) => void
 ) {
     // let data = R.useRef<MusicAnalysis>(window.structuredClone(florecerData))
-    let analysis = R.useMemo(
-        () => window.structuredClone(florecerData) as MusicAnalysis,
-        []
-    )
+    let analysis = R.useMemo(() => {
+        if ('structuredClone' in window) {
+            return window.structuredClone(florecerData) as MusicAnalysis
+        }
+        /** fallback */
+        X.log.debug('🌸', {
+            sopa: '📛⛑ falling from structuredClone',
+            agent: window.navigator.userAgent,
+        })
+        return clone(florecerData) as MusicAnalysis
+    }, [])
     let currentChunk = R.useRef<[number, Beat | Section]>([0, analysis[type][0]])
     let currentIndex = R.useRef(0)
 
@@ -78,7 +86,10 @@ export function useMotions(
         if (!inMotion.current) {
             if (position > cChunk.start && position < cEnd) {
                 inMotion.current = true
-                log(`${type} - ${currentChunk.current[0]}`, styles[currentChunk.current[0] % 3])
+                log(
+                    `${type} - ${currentChunk.current[0]}`,
+                    styles[currentChunk.current[0] % 3]
+                )
                 // todo: better name
                 enterCallback({ chunk: cChunk, state, current: currentChunk.current })
             }
