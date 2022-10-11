@@ -15,6 +15,8 @@ type MyGlobalState = {
   changeParticles: (val: number) => void
   songPosition: number
   changeSongPosition: (val: number) => void
+  changedColorsCounter: number
+  changeColors: () => void
   // color2: string;
   // intensiveComputation: string;
   // changecolor1: (value: string) => void;
@@ -63,57 +65,70 @@ const useStoreImpl = create<MyGlobalState>((set) => {
     changeSongPosition: (val) => {
       set((prev) => {
         // console.log(`prev`, prev)
-        return ({
+        return {
           ...prev,
           songPosition: val,
-        })
-      }
-      )
+        }
+      })
+    },
+    changedColorsCounter: 0,
+    changeColors: () => {
+      set((prev) => {
+        // console.log(`prev`, prev)
+        return {
+          ...prev,
+          changedColorsCounter: prev.changedColorsCounter + 1,
+        }
+      })
     },
   }
 })
 
-const useStore = (sel: (state: MyGlobalState) => any) => useStoreImpl(sel, shallow)
+const useStore = (sel: (state: MyGlobalState) => any) =>
+  useStoreImpl(sel, shallow)
 
 Object.assign(useStore, useStoreImpl)
 
 const { getState, setState } = useStoreImpl
 
 export function useDebugBeats() {
-  const state = useStore((state) => state.debugBeats);
-  const setState = useStore((state) => state.changeBeats);
-  return [state, setState] as const;
+  const state = useStore((state) => state.debugBeats)
+  const setState = useStore((state) => state.changeBeats)
+  return [state, setState] as const
 }
 
 export function useDebugParticles() {
-  const state = useStore((state) => state.debugParticles);
-  const setState = useStore((state) => state.changeParticles);
-  return [state, setState] as const;
+  const state = useStore((state) => state.debugParticles)
+  const setState = useStore((state) => state.changeParticles)
+  return [state, setState] as const
 }
 
 export function useDebugSegments() {
-  const state = useStore((state) => state.debugSegments);
-  const setState = useStore((state) => state.changeSegments);
-  return [state, setState] as const;
+  const state = useStore((state) => state.debugSegments)
+  const setState = useStore((state) => state.changeSegments)
+  return [state, setState] as const
 }
 
 export function useDebugSections() {
-  const state = useStore((state) => state.debugSections);
-  const setState = useStore((state) => state.changeSections);
-  return [state, setState] as const;
+  const state = useStore((state) => state.debugSections)
+  const setState = useStore((state) => state.changeSections)
+  return [state, setState] as const
 }
 
 export function useSongPosition() {
-  const state = useStore((state) => state.songPosition);
-  const setState = useStore((state) => state.changeSongPosition);
-  return [state, setState] as const;
+  const state = useStore((state) => state.songPosition)
+  const setState = useStore((state) => state.changeSongPosition)
+  return [state, setState] as const
 }
 
-export function useFPS() {
-  const state = useStore((state) => state.fps);
-  const setState = useStore((state) => state.setFPS);
-  return [state, setState] as const;
+export function useTriggerChangeColor() {
+  // todo: an event could be better?
+  const state = useStore((state) => state.changedColorsCounter)
+  const setState = useStore((state) => state.changeColors)
+  return [state, setState] as const
 }
+
+
 
 export { getState, setState }
 export default useStore

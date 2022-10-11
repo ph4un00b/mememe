@@ -8,7 +8,11 @@ import vertexShader from './flor.vertex.glsl'
 import { fragmentShader } from './flor.frag'
 import { florAttributes } from './flor.attr'
 import { useMotions } from './flor.motion'
-import { useDebugBeats, useDebugParticles } from '@/helpers/store'
+import {
+    useDebugBeats,
+    useDebugParticles,
+    useTriggerChangeColor,
+} from '@/helpers/store'
 import { useAudioPosition } from 'react-use-audio-player'
 import { useInterval } from '@/utils/hooks'
 
@@ -101,10 +105,15 @@ export default function FlorScene({
     // const [[, niceColors]] = useColoritos({ quantity: 2 })
     const [niceColors, setColors] = R.useState(['#bb0000', '#00ff00'])
 
-    useInterval(() => {
-        // console.log(niceColors)
+    // useInterval(() => {
+    //     // console.log(niceColors)
+    //     setColors(createColorsArray(2, Math.floor(Math.random() * 800)))
+    // }, 1000)
+
+    const [colorChangeRequested] = useTriggerChangeColor()
+    R.useLayoutEffect(() => {
         setColors(createColorsArray(2, Math.floor(Math.random() * 800)))
-    }, 1000)
+    }, [colorChangeRequested])
 
     const arrays = R.useMemo(() => {
         return florAttributes(
@@ -116,7 +125,17 @@ export default function FlorScene({
             leverE,
             leverR2
         )
-    }, [particles, offset, leverC, leverCrazy, leverD, leverE, leverR, leverR2])
+    }, [
+        particles,
+        offset,
+        leverC,
+        leverCrazy,
+        leverD,
+        leverE,
+        leverR,
+        leverR2,
+        colorChangeRequested,
+    ])
 
     const [, changeDebugBeats] = useDebugBeats()
     const [, changeDebugParticles] = useDebugParticles()
@@ -130,6 +149,7 @@ export default function FlorScene({
     F.useFrame(({ clock }) => {
         const time = clock.getElapsedTime()
         geometry.current.attributes.position.needsUpdate = true
+        geometry.current.attributes.color.needsUpdate = true
         points.current.rotation.y = time * 0.2
         shader.uniforms.uTime.value = time
 

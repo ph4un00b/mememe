@@ -16,9 +16,8 @@ import {
     useDebugBeats,
     useDebugParticles,
     useDebugSections,
-    useDebugSegments,
-    useFPS,
     useSongPosition,
+    useTriggerChangeColor,
 } from '@/helpers/store'
 import { IfFeatureEnabled } from '@growthbook/growthbook-react'
 import florecerData from '../music/florecer.json'
@@ -53,6 +52,7 @@ function Page(props) {
         setCollapsed(!true)
     }, 3210)
 
+    const [, triggerColorChange] = useTriggerChangeColor()
     return (
         <>
             <div
@@ -76,10 +76,10 @@ function Page(props) {
                     className='cyberpunk'
                     onClick={() => {
                         X.log.debug('🌸', { sopa: 'change color 🌈' })
-                        togglePlayPause()
+                        triggerColorChange()
                     }}
                 >
-                    {!ready && !loading ? 'Loading' : 'Play'}
+                    Color
                 </button>
 
                 <IfFeatureEnabled feature='florecer-debug'>
