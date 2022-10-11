@@ -17,10 +17,12 @@ import {
     useDebugParticles,
     useDebugSections,
     useDebugSegments,
+    useFPS,
     useSongPosition,
 } from '@/helpers/store'
 import { IfFeatureEnabled } from '@growthbook/growthbook-react'
 import florecerData from '../music/florecer.json'
+import { getGPUTier } from 'detect-gpu';
 
 // const Box = dynamic(() => import('@/components/canvas/Box'), {
 //     ssr: false,
@@ -51,6 +53,43 @@ function Page(props) {
     // if (!ready && !loading) return <div>No audio to play</div>
     // if (loading) return <div>Loading audio</div>
 
+    const [fps, setFPS] = useFPS()
+    R.useEffect(() => {
+        let gpuTier
+        (async () => {
+            gpuTier = await getGPUTier();
+            // console.log(gpuTier)
+
+            // Example output:
+            // {
+            //   "tier": 1,
+            //   "isMobile": false,
+            //   "type": "BENCHMARK",
+            //   "fps": 21,
+            //   "gpu": "intel iris graphics 6100"
+            // }
+
+            const pixels =
+                'devicePixelRatio' in window
+                    ? window.devicePixelRatio * window.innerHeight * window.innerWidth
+                    : 1 * window.innerHeight * window.innerWidth
+
+            if ('devicePixelRatio' in window) {
+                X.log.debug('🌸', {
+                    sopa: '🖥',
+                    gpu: gpuTier,
+                    pixels,
+                    pixelRation: window.devicePixelRatio,
+                    innerWidth: window.innerWidth,
+                    innerHeight: window.innerHeight,
+                })
+            }
+            setFPS(gpuTier.fps)
+        })();
+
+
+    }, [])
+
     return (
         <>
             <div
@@ -68,6 +107,8 @@ function Page(props) {
                     }}
                 >
                     {!ready && !loading ? 'Loading' : 'Play'}
+                    {' - '}
+                    {fps}
                 </button>
 
                 <IfFeatureEnabled feature='florecer-debug'>
@@ -75,11 +116,11 @@ function Page(props) {
                 </IfFeatureEnabled>
             </div>
             <Leva
-                collapsed={{
-                    collapsed,
-                    onChange(c) { },
-                }}
-                hidden={true}
+                // collapsed={{
+                //     collapsed: false,
+                //     onChange(c) { },
+                // }}
+                hidden={!true}
             />
         </>
     )

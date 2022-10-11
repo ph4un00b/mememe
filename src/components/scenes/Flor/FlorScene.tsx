@@ -10,14 +10,21 @@ import vertexShader from './flor.vertex.glsl'
 import { fragmentShader } from './flor.frag'
 import { florAttributes } from './flor.attr'
 import { useMotions } from './flor.motion'
-import { useDebugBeats, useDebugParticles } from '@/helpers/store'
+import { useDebugBeats, useDebugParticles, useFPS } from '@/helpers/store'
 import { useAudioPosition } from 'react-use-audio-player'
 
 export default function FlorScene() {
-    let adjustedParticles = R.useRef(browser.isMobile() ? 20_000 : 70_000)
-    let maxParticlesSmall = R.useRef(browser.isMobile() ? 4_000 /** +1000 */ : 70_000)
+    const [fps] = useFPS()
+
+    let adjustedParticles = R.useRef(browser.isMobile() ? fps * 222 : 70_000)
+    let maxParticlesSmall = R.useRef(
+        browser.isMobile() ? fps * 44 /** +1000 */ : 70_000
+    )
     let maxASmall = R.useRef(browser.isMobile() ? 0.2 : 0.65)
+    // let maxASmall = R.useRef(iphone ? 0.30 : 0.65)
     let maxABig = R.useRef(browser.isMobile() ? 0.65 : 1)
+
+
 
     const geometry = R.useRef<T.BufferGeometry>(null!)
     const points = R.useRef<T.Points>(null!)
@@ -35,7 +42,37 @@ export default function FlorScene() {
             leverR2,
         },
         Lset,
-    ] = L.useControls(() => florControls(adjustedParticles))
+    ] = L.useControls(() => ({
+        leverA: {
+            value: 0.65,
+            min: 0,
+            max: browser.isMobile() ? 0.65 : 70_000,
+            step: 0.01,
+        },
+        offset: { value: 0.0, min: 0, max: 1, step: 0.01 },
+        leverC: { value: 1, min: 1, max: 20, step: 1 },
+        leverD: { value: 17, min: 0, max: 20, step: 1 },
+        leverE: { value: 1.68, min: 0, max: 2, step: 0.001 },
+        leverCrazy: { value: 0.45, min: 0.01, max: 2, step: 0.01 },
+        leverR: { value: 2.0, min: 0, max: 2, step: 0.001 },
+        leverR2: { value: 10, min: 1, max: 10, strep: 0.001 },
+        particles: {
+            value: adjustedParticles.current,
+            min: 0,
+            max: adjustedParticles.current,
+        },
+    }))
+
+    R.useEffect(() => {
+        adjustedParticles.current = browser.isMobile() ? fps * 222 : 70_000
+        maxParticlesSmall.current = browser.isMobile()
+            ? fps * 44 /** +padding on beats */
+            : 70_000
+
+        if (fps < 30) {
+            Lset({ leverA: 0.45 })
+        }
+    }, [fps])
 
     const { gl, viewport, size } = F.useThree()
     /** @link https://github.com/pmndrs/react-three-fiber/discussions/1012 */
@@ -101,27 +138,30 @@ export default function FlorScene() {
         { type: 'beats' },
         function leavingCallback({ next }) {
             // const newParticles = 0.7 * adjustedParticles.current
-            const newParticles = 15_000
+            // const newParticles = 15_000
+            if (fps >= 30) {
+                const newParticles = fps * 222
 
-            // changeDebugBeats(camera.position.z)
-            Lset({ particles: newParticles })
-            Lset({ leverA: maxABig.current })
+                // changeDebugBeats(camera.position.z)
+                Lset({ particles: newParticles })
+                Lset({ leverA: maxABig.current })
+            }
+
             Lset({ leverCrazy: 0.5 * 0.45 + Math.random() })
         },
         function enterCallback({ chunk, current }) {
             if (chunk.confidence >= 0.4) {
+                if (fps >= 30) {
+                    const newParticles = Math.floor(
+                        fps * 1_11 + Math.random() * maxParticlesSmall.current
+                    )
 
-                const newParticles = Math.floor(
-                    10_000 + Math.random() * maxParticlesSmall.current
-                )
-
-                // changeDebugParticles(newParticles)
-                Lset({ particles: newParticles })
-                Lset({ leverA: maxASmall.current })
+                    // changeDebugParticles(newParticles)
+                    Lset({ particles: newParticles })
+                    Lset({ leverA: maxASmall.current })
+                }
                 Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
             }
-
-
         },
         function frameCallback({ chunk, state, current }) {
             // Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
@@ -165,7 +205,14 @@ export default function FlorScene() {
             }
 
             if (index >= 1 && index < 8 && event == 'entering') {
-                const velocity = mapRange(index, { iMin: 0, iMax: 7 }, { oMin: 0.1, oMax: 0.6 })
+                const velocity = mapRange(
+                    index,
+                    { iMin: 0, iMax: 7 },
+                    {
+                        oMin: 0.1,
+                        oMax: 0.6,
+                    }
+                )
                 camera.position.z = Math.cos(
                     camera.position.z + state.clock.elapsedTime * velocity
                 )
@@ -175,7 +222,14 @@ export default function FlorScene() {
             }
 
             if (index >= 1 && index < 8 && event == 'leaving') {
-                const velocity = mapRange(index, { iMin: 0, iMax: 7 }, { oMin: 0.1, oMax: 0.6 })
+                const velocity = mapRange(
+                    index,
+                    { iMin: 0, iMax: 7 },
+                    {
+                        oMin: 0.1,
+                        oMax: 0.6,
+                    }
+                )
                 camera.position.z = Math.cos(
                     camera.position.z + state.clock.elapsedTime * velocity
                 )
@@ -199,7 +253,8 @@ export default function FlorScene() {
              */
 
             if (index >= 9 && index < 12 && event == 'entering') {
-                const velocity = 2 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.1, oMax: 2 })
+                const velocity =
+                    2 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.1, oMax: 2 })
                 // changeDebugBeats(velocity)
                 camera.position.z = Math.cos(
                     camera.position.z + state.clock.elapsedTime * velocity
@@ -210,7 +265,8 @@ export default function FlorScene() {
             }
 
             if (index > 9 && index <= 12 && event == 'leaving') {
-                const velocity = 2 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.9, oMax: 2 })
+                const velocity =
+                    2 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.9, oMax: 2 })
                 // changeDebugBeats(velocity)
                 camera.position.z = Math.cos(
                     camera.position.z + state.clock.elapsedTime * velocity
@@ -266,24 +322,24 @@ function mapRange(
     value: number,
     { iMin: inputMin, iMax: inputMax }: { iMin: number; iMax: number },
     { oMin: outputMin, oMax: outputMax }: { oMin: number; oMax: number },
-    clamp = false,
+    clamp = false
 ) {
     /** @link https://openframeworks.cc/documentation/math/ofMath/#show_ofMap */
     if (Math.abs(inputMin - inputMax) < Number.EPSILON) {
-        return outputMin;
+        return outputMin
     } else {
         let outVal =
             ((value - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) +
-            outputMin;
+            outputMin
         if (clamp) {
             if (outputMax < outputMin) {
-                if (outVal < outputMax) outVal = outputMax;
-                else if (outVal > outputMin) outVal = outputMin;
+                if (outVal < outputMax) outVal = outputMax
+                else if (outVal > outputMin) outVal = outputMin
             } else {
-                if (outVal > outputMax) outVal = outputMax;
-                else if (outVal < outputMin) outVal = outputMin;
+                if (outVal > outputMax) outVal = outputMax
+                else if (outVal < outputMin) outVal = outputMin
             }
         }
-        return outVal;
+        return outVal
     }
 }

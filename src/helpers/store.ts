@@ -3,6 +3,8 @@ import shallow from 'zustand/shallow'
 
 type MyGlobalState = {
   dom: HTMLDivElement | null
+  fps: number
+  setFPS: (val: number) => void
   debugBeats: number
   changeBeats: (val: number) => void
   debugSegments: number
@@ -22,6 +24,13 @@ type MyGlobalState = {
 const useStoreImpl = create<MyGlobalState>((set) => {
   return {
     dom: null,
+    fps: 1,
+    setFPS: (val) => {
+      set((prev) => ({
+        ...prev,
+        fps: val,
+      }))
+    },
     debugBeats: 0,
     changeBeats: (val) => {
       set((prev) => ({
@@ -97,6 +106,12 @@ export function useDebugSections() {
 export function useSongPosition() {
   const state = useStore((state) => state.songPosition);
   const setState = useStore((state) => state.changeSongPosition);
+  return [state, setState] as const;
+}
+
+export function useFPS() {
+  const state = useStore((state) => state.fps);
+  const setState = useStore((state) => state.setFPS);
   return [state, setState] as const;
 }
 

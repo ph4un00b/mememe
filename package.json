@@ -11,6 +11,7 @@
     "@react-spring/three": "^9.5.5",
     "@react-three/drei": "^9.32.3",
     "@react-three/fiber": "^8.8.4",
+    "detect-gpu": "^4.0.43",
     "glsl-random": "^0.0.5",
     "leva": "^0.9.31",
     "lodash.clone": "^4.5.0",
