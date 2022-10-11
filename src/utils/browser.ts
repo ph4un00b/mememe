@@ -3,3 +3,7 @@ export function isMobile() {
         window.navigator.userAgent
     )
 }
+
+export function isIpod() {
+    return /iPod/i.test(window.navigator.userAgent)
+}

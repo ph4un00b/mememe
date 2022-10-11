@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic'
 import FlorScene from '@/components/scenes/Flor/FlorScene'
 import * as meta from '@/config'
-import { PerspectiveCamera } from '@react-three/drei'
+import { PerspectiveCamera, useDetectGPU } from '@react-three/drei'
 import * as X from 'next-axiom'
 import { Leva } from 'leva'
 import * as hooks from '@/utils/hooks'
@@ -22,8 +22,8 @@ import {
 } from '@/helpers/store'
 import { IfFeatureEnabled } from '@growthbook/growthbook-react'
 import florecerData from '../music/florecer.json'
-import { getGPUTier } from 'detect-gpu';
-
+import * as D from '@react-three/drei'
+import { Text } from '@react-three/drei'
 // const Box = dynamic(() => import('@/components/canvas/Box'), {
 //     ssr: false,
 // })
@@ -50,46 +50,6 @@ function Page(props) {
         setCollapsed(!true)
     }, 3210)
 
-    // if (!ready && !loading) return <div>No audio to play</div>
-    // if (loading) return <div>Loading audio</div>
-
-    const [fps, setFPS] = useFPS()
-    R.useEffect(() => {
-        let gpuTier
-        (async () => {
-            gpuTier = await getGPUTier();
-            // console.log(gpuTier)
-
-            // Example output:
-            // {
-            //   "tier": 1,
-            //   "isMobile": false,
-            //   "type": "BENCHMARK",
-            //   "fps": 21,
-            //   "gpu": "intel iris graphics 6100"
-            // }
-
-            const pixels =
-                'devicePixelRatio' in window
-                    ? window.devicePixelRatio * window.innerHeight * window.innerWidth
-                    : 1 * window.innerHeight * window.innerWidth
-
-            if ('devicePixelRatio' in window) {
-                X.log.debug('🌸', {
-                    sopa: '🖥',
-                    gpu: gpuTier,
-                    pixels,
-                    pixelRation: window.devicePixelRatio,
-                    innerWidth: window.innerWidth,
-                    innerHeight: window.innerHeight,
-                })
-            }
-            setFPS(gpuTier.fps)
-        })();
-
-
-    }, [])
-
     return (
         <>
             <div
@@ -107,8 +67,6 @@ function Page(props) {
                     }}
                 >
                     {!ready && !loading ? 'Loading' : 'Play'}
-                    {' - '}
-                    {fps}
                 </button>
 
                 <IfFeatureEnabled feature='florecer-debug'>
@@ -138,10 +96,22 @@ Page.r3f = function (props) {
                 makeDefault={true}
             />
 
-            <FlorScene />
+            <LoadFlorecer />
             {/* <axesHelper args={[8]} /> */}
         </>
     )
+}
+
+function LoadFlorecer() {
+    const { device, fps, gpu, isMobile, tier, type } = D.useDetectGPU()
+
+    if (browser.isIpod() || tier == 2) {
+        return <FlorScene tier={'mid'} maxParticles={15_000} smallParticles={10_000} smallSize={0.25} bigSize={0.30} />
+    } else if (tier == 3) {
+        return <FlorScene tier={'high'} maxParticles={70_000} smallParticles={70_000} smallSize={0.25} bigSize={0.40} />
+    } else if (tier < 2) {
+        return <FlorScene tier={'low'} maxParticles={2_500} smallParticles={2_000} smallSize={0.35} bigSize={0.40} />
+    }
 }
 
 function Debug() {

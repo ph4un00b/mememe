@@ -12,19 +12,22 @@ import { florAttributes } from './flor.attr'
 import { useMotions } from './flor.motion'
 import { useDebugBeats, useDebugParticles, useFPS } from '@/helpers/store'
 import { useAudioPosition } from 'react-use-audio-player'
+import { getGPUTier } from 'detect-gpu'
+import * as X from 'next-axiom'
 
-export default function FlorScene() {
-    const [fps] = useFPS()
-
-    let adjustedParticles = R.useRef(browser.isMobile() ? fps * 222 : 70_000)
-    let maxParticlesSmall = R.useRef(
-        browser.isMobile() ? fps * 44 /** +1000 */ : 70_000
-    )
-    let maxASmall = R.useRef(browser.isMobile() ? 0.2 : 0.65)
-    // let maxASmall = R.useRef(iphone ? 0.30 : 0.65)
-    let maxABig = R.useRef(browser.isMobile() ? 0.65 : 1)
-
-
+export default function FlorScene({
+    maxParticles,
+    smallParticles,
+    smallSize,
+    bigSize,
+    tier,
+}: {
+    maxParticles: number
+    smallParticles: number
+    smallSize: number
+    bigSize: number
+    tier: 'low' | 'mid' | 'high'
+}) {
 
     const geometry = R.useRef<T.BufferGeometry>(null!)
     const points = R.useRef<T.Points>(null!)
@@ -44,35 +47,24 @@ export default function FlorScene() {
         Lset,
     ] = L.useControls(() => ({
         leverA: {
-            value: 0.65,
+            value: bigSize,
             min: 0,
-            max: browser.isMobile() ? 0.65 : 70_000,
+            max: bigSize,
             step: 0.01,
         },
         offset: { value: 0.0, min: 0, max: 1, step: 0.01 },
         leverC: { value: 1, min: 1, max: 20, step: 1 },
         leverD: { value: 17, min: 0, max: 20, step: 1 },
         leverE: { value: 1.68, min: 0, max: 2, step: 0.001 },
-        leverCrazy: { value: 0.45, min: 0.01, max: 2, step: 0.01 },
+        leverCrazy: { value: 0.45, min: 0.01, max: 0.7, step: 0.01 },
         leverR: { value: 2.0, min: 0, max: 2, step: 0.001 },
         leverR2: { value: 10, min: 1, max: 10, strep: 0.001 },
         particles: {
-            value: adjustedParticles.current,
+            value: maxParticles,
             min: 0,
-            max: adjustedParticles.current,
+            max: maxParticles,
         },
     }))
-
-    R.useEffect(() => {
-        adjustedParticles.current = browser.isMobile() ? fps * 222 : 70_000
-        maxParticlesSmall.current = browser.isMobile()
-            ? fps * 44 /** +padding on beats */
-            : 70_000
-
-        if (fps < 30) {
-            Lset({ leverA: 0.45 })
-        }
-    }, [fps])
 
     const { gl, viewport, size } = F.useThree()
     /** @link https://github.com/pmndrs/react-three-fiber/discussions/1012 */
@@ -137,30 +129,29 @@ export default function FlorScene() {
     useMotions(
         { type: 'beats' },
         function leavingCallback({ next }) {
-            // const newParticles = 0.7 * adjustedParticles.current
-            // const newParticles = 15_000
-            if (fps >= 30) {
-                const newParticles = fps * 222
+            // changeDebugBeats(camera.position.z)
+            // Lset({ particles: newParticles })
+            Lset({ leverA: bigSize })
 
-                // changeDebugBeats(camera.position.z)
-                Lset({ particles: newParticles })
-                Lset({ leverA: maxABig.current })
+            if (tier == 'low') {
+                Lset({ leverCrazy: 0.35 })
+            } else {
+                Lset({ leverCrazy: 0.5 * 0.45 + Math.random() })
             }
-
-            Lset({ leverCrazy: 0.5 * 0.45 + Math.random() })
         },
         function enterCallback({ chunk, current }) {
             if (chunk.confidence >= 0.4) {
-                if (fps >= 30) {
-                    const newParticles = Math.floor(
-                        fps * 1_11 + Math.random() * maxParticlesSmall.current
-                    )
+                // changeDebugParticles(newParticles)
+                // Lset({ particles: adjustedParticles.current })
+                Lset({ leverA: smallSize })
 
-                    // changeDebugParticles(newParticles)
-                    Lset({ particles: newParticles })
-                    Lset({ leverA: maxASmall.current })
+                if (tier == 'low') {
+                    Lset({ leverCrazy: 0.2 })
+                } else if (tier == 'mid') {
+                    Lset({ leverCrazy: 0.25 })
+                } else {
+                    Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
                 }
-                Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
             }
         },
         function frameCallback({ chunk, state, current }) {
