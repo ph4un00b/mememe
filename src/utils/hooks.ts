@@ -1,6 +1,23 @@
 import * as R from 'react'
 
 /** @link https://overreacted.io/making-setinterval-declarative-with-react-hooks/ */
+export function useInterval(callback: () => void, delay: number) {
+    const savedCallback = R.useRef<() => void>(null!);
+
+    R.useEffect(() => {
+        savedCallback.current = callback;
+    });
+
+    R.useEffect(() => {
+        function tick() {
+            savedCallback.current();
+        }
+
+        let id = window.setInterval(tick, delay);
+        return () => window.clearInterval(id);
+    }, [delay]);
+}
+
 export function useTimeout(callback: () => void, delay: number) {
     const savedCallback = R.useRef<() => void>(null!);
 

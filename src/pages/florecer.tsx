@@ -39,7 +39,7 @@ function Page(props) {
         html5: false,
         onend: () => {
             setEnd(true)
-            X.log.debug('🌸', { ended: true, sopa: '🎊💃' })
+            X.log.debug('🌸', { ended: true, sopa: 'termino 🎊💃' })
         },
         // onseek: (e) => {
         //     console.log('cambiar!!')
@@ -66,6 +66,16 @@ function Page(props) {
                     className='cyberpunk'
                     onClick={() => {
                         X.log.debug('🌸', { sopa: 'toggle musique 🎼' })
+                        togglePlayPause()
+                    }}
+                >
+                    {!ready && !loading ? 'Loading' : 'Play'}
+                </button>
+
+                <button
+                    className='cyberpunk'
+                    onClick={() => {
+                        X.log.debug('🌸', { sopa: 'change color 🌈' })
                         togglePlayPause()
                     }}
                 >

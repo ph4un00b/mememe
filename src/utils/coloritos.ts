@@ -12,16 +12,9 @@ export function useColoritos({
     return R.useState(() => {
         const c = new T.Color();
 
-        const colors = Array.from(
-            { length: quantity },
-            () => nice_colors[preset][Math.floor(Math.random() * 4)]
-        );
+        const colors = createColorsArray(quantity, preset);
 
-        const colorsRGB = Float32Array.from(
-            Array.from({ length: quantity }, (_, i) =>
-                c.set(colors[i]).convertSRGBToLinear().toArray()
-            ).flat()
-        );
+        const colorsRGB = createColor32FArray(quantity, c, colors);
 
         return [colorsRGB, colors] as const;
     });
@@ -1021,3 +1014,18 @@ const nice_colors = [
     ['#bf9f88', '#e8c8a1', '#fce4be', '#f6a68d', '#f96153'],
     ['#a8ab9b', '#172a38', '#ec4b5d', '#f48773', '#e0c590'],
 ];
+
+export function createColor32FArray(quantity: number, c: T.Color, colors: string[]) {
+    return Float32Array.from(
+        Array.from({ length: quantity }, (_, i) => c.set(colors[i]).convertSRGBToLinear().toArray()
+        ).flat()
+    );
+}
+
+export function createColorsArray(quantity: number, preset: number) {
+    return Array.from(
+        { length: quantity },
+        () => nice_colors[preset][Math.floor(Math.random() * 4)]
+    );
+}
+

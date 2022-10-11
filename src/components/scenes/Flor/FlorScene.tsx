@@ -2,7 +2,7 @@ import * as R from 'react'
 import * as T from 'three'
 import * as L from 'leva'
 import * as F from '@react-three/fiber'
-import { useColoritos } from '@/utils/coloritos'
+import { createColorsArray, useColoritos } from '@/utils/coloritos'
 // @ts-ignore
 import vertexShader from './flor.vertex.glsl'
 import { fragmentShader } from './flor.frag'
@@ -10,6 +10,7 @@ import { florAttributes } from './flor.attr'
 import { useMotions } from './flor.motion'
 import { useDebugBeats, useDebugParticles } from '@/helpers/store'
 import { useAudioPosition } from 'react-use-audio-player'
+import { useInterval } from '@/utils/hooks'
 
 export default function FlorScene({
     maxParticles,
@@ -24,7 +25,6 @@ export default function FlorScene({
     bigSize: number
     tier: 'low' | 'mid' | 'high'
 }) {
-
     const geometry = R.useRef<T.BufferGeometry>(null!)
     const points = R.useRef<T.Points>(null!)
 
@@ -98,7 +98,13 @@ export default function FlorScene({
         }
     }, [particles, offset, leverC, leverCrazy, leverD, leverE, leverR, leverR2])
 
-    const [[, niceColors]] = useColoritos({ quantity: 2 })
+    // const [[, niceColors]] = useColoritos({ quantity: 2 })
+    const [niceColors, setColors] = R.useState(['#bb0000', '#00ff00'])
+
+    useInterval(() => {
+        // console.log(niceColors)
+        setColors(createColorsArray(2, Math.floor(Math.random() * 800)))
+    }, 1000)
 
     const arrays = R.useMemo(() => {
         return florAttributes(
@@ -111,7 +117,6 @@ export default function FlorScene({
             leverR2
         )
     }, [particles, offset, leverC, leverCrazy, leverD, leverE, leverR, leverR2])
-
 
     const [, changeDebugBeats] = useDebugBeats()
     const [, changeDebugParticles] = useDebugParticles()
@@ -198,14 +203,16 @@ export default function FlorScene({
 
         if (currentSection.current >= 8 && currentSection.current < 11) {
             // we can precalculate this below if needed
-            const val = 1.5 - mapRange(
-                currentSection.current,
-                { iMin: 8, iMax: 11 },
-                {
-                    oMin: 0.1,
-                    oMax: 1.5,
-                }
-            )
+            const val =
+                1.5 -
+                mapRange(
+                    currentSection.current,
+                    { iMin: 8, iMax: 11 },
+                    {
+                        oMin: 0.1,
+                        oMax: 1.5,
+                    }
+                )
 
             camera.position.z = Math.cos(
                 // despues incrementar a 1
@@ -223,7 +230,6 @@ export default function FlorScene({
         camera.rotateZ(clock.elapsedTime * 0.1)
     })
 
-
     useMotions(
         { type: 'beats' },
         function leavingCallback({ next }) {
@@ -232,7 +238,7 @@ export default function FlorScene({
             Lset({ leverA: bigSize })
 
             if (tier == 'low') {
-                Lset({ leverCrazy: 0.30 })
+                Lset({ leverCrazy: 0.3 })
             } else {
                 Lset({ leverCrazy: 0.5 * 0.45 + Math.random() })
             }
@@ -258,24 +264,16 @@ export default function FlorScene({
                     Lset({ leverD: Math.floor(1 + Math.random() * 8) })
                     //     camera.rotateZ(state.clock.elapsedTime * 0.1)
                 }
-
             }
         },
-        function frameCallback({ chunk, state, current }) {
-
-        }
+        function frameCallback({ chunk, state, current }) { }
     )
-
 
     const group = R.useRef<T.Group>(null!)
     useMotions(
         { type: 'sections' },
-        function beforeLeaveCallback({ next, current }) {
-
-        },
-        function enterCallback({ chunk, state, current }) {
-
-        },
+        function beforeLeaveCallback({ next, current }) { },
+        function enterCallback({ chunk, state, current }) { },
         function frameCallback({ chunk, state, current, event }) {
             const [index] = current
 
@@ -301,7 +299,6 @@ export default function FlorScene({
                         oMax: 0.6,
                     }
                 )
-
             }
 
             if (index == 8 && event == 'entering') {
@@ -331,7 +328,6 @@ export default function FlorScene({
             if (index > 9 && index <= 12 && event == 'leaving') {
                 const velocity =
                     2 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.9, oMax: 2 })
-
             }
         }
     )
