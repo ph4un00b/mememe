@@ -2,19 +2,12 @@ import * as R from 'react'
 import * as T from 'three'
 import * as L from 'leva'
 import * as F from '@react-three/fiber'
-import { createColorsArray, useColoritos } from '@/utils/coloritos'
+import { createColorsArray } from '@/utils/coloritos'
 // @ts-ignore
 import vertexShader from './flor.vertex.glsl'
 import { fragmentShader } from './flor.frag'
 import { florAttributes } from './flor.attr'
-import { useMotions } from './flor.motion'
-import {
-    useDebugBeats,
-    useDebugParticles,
-    useTriggerChangeColor,
-} from '@/helpers/store'
-import { useAudioPosition } from 'react-use-audio-player'
-import { useInterval } from '@/utils/hooks'
+import { useTriggerChangeColor } from '@/helpers/store'
 import { useSceneMotions } from './flor.effects'
 
 export default function FlorScene({
@@ -189,4 +182,3 @@ export default function FlorScene({
         </group>
     )
 }
-
