@@ -43,6 +43,10 @@ export default function FlorScene({
             leverE,
             leverR,
             leverR2,
+            gX,
+            rotateZ,
+            rotateX,
+            rotateY
         },
         Lset,
     ] = L.useControls(() => ({
@@ -59,6 +63,10 @@ export default function FlorScene({
         leverCrazy: { value: 0.45, min: 0.01, max: 0.7, step: 0.01 },
         leverR: { value: 2.0, min: 0, max: 2, step: 0.001 },
         leverR2: { value: 10, min: 1, max: 10, strep: 0.001 },
+        gX: { value: 0, min: -1, max: 1, strep: 0.001 },
+        rotateZ: { value: 0, min: -0.5, max: 0.5, strep: 0.001 },
+        rotateX: { value: 0, min: -0.5, max: 0.5, strep: 0.001 },
+        rotateY: { value: 0, min: -0.5, max: 0.5, strep: 0.001 },
         particles: {
             value: maxParticles,
             min: 0,
@@ -110,12 +118,6 @@ export default function FlorScene({
         )
     }, [particles, offset, leverC, leverCrazy, leverD, leverE, leverR, leverR2])
 
-    F.useFrame(({ clock }) => {
-        const time = clock.getElapsedTime()
-        geometry.current.attributes.position.needsUpdate = true
-        points.current.rotation.y = time * 0.2
-        shader.uniforms.uTime.value = time
-    })
 
     const [, changeDebugBeats] = useDebugBeats()
     const [, changeDebugParticles] = useDebugParticles()
@@ -126,6 +128,62 @@ export default function FlorScene({
         highRefreshRate: true,
     })
 
+    F.useFrame(({ clock }) => {
+        const time = clock.getElapsedTime()
+        geometry.current.attributes.position.needsUpdate = true
+        points.current.rotation.y = time * 0.2
+        shader.uniforms.uTime.value = time
+
+        // group.current.rotateX(clock.elapsedTime * rotateX)
+        // // efecto mariposa
+        // group.current.rotateY(clock.elapsedTime * rotateY)
+        // group.current.rotateZ(clock.elapsedTime * rotateZ)
+
+        // camera.rotateZ(clock.elapsedTime * rotateZ)
+        // camera.rotateX(clock.elapsedTime * rotateX)
+        // camera.rotateY(clock.elapsedTime * rotateY)
+
+        // camera.translateX(rotateX)
+        // // Y effect
+        // camera.translateY(rotateY)
+        // // soft acercarse effect
+        // camera.translateZ(rotateZ)
+
+        // // distorsion
+        // group.current.translateX(rotateX)
+        // // Y effect
+        // group.current.translateY(rotateY)
+        // // distorsion
+        // group.current.translateZ(rotateZ)
+
+        // distorsion
+        // points.current.rotateX(rotateX)
+        // points.current.rotateY(rotateY)
+        // points.current.rotateZ(rotateZ)
+
+        // points.current.translateX(rotateX)
+        // points.current.translateY(rotateY)
+        // // cool effect
+        // points.current.translateZ(rotateZ)
+    })
+
+    F.useFrame(({ clock }) => {
+        camera.position.z = Math.cos(
+            // despues incrementar a 1
+            camera.position.z + clock.elapsedTime * +0.1
+        )
+        camera.position.y = Math.sin(
+            // 1. incrementar a 1
+            camera.position.x + clock.elapsedTime * -0.1
+        )
+    })
+
+    F.useFrame(({ clock }) => {
+        camera.rotateZ(clock.elapsedTime * 0.1)
+        // console.log(clock.elapsedTime * 0.1)
+    })
+
+
     useMotions(
         { type: 'beats' },
         function leavingCallback({ next }) {
@@ -134,7 +192,7 @@ export default function FlorScene({
             Lset({ leverA: bigSize })
 
             if (tier == 'low') {
-                Lset({ leverCrazy: 0.35 })
+                Lset({ leverCrazy: 0.30 })
             } else {
                 Lset({ leverCrazy: 0.5 * 0.45 + Math.random() })
             }
@@ -155,20 +213,14 @@ export default function FlorScene({
             }
         },
         function frameCallback({ chunk, state, current }) {
-            // Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
-            // Lset({ leverCrazy: state.clock.elapsedTime * 0.1 })
+            // try group
             // if (chunk.confidence < 0.4) {
-            points.current.rotateX(0.01)
-            points.current.rotateY(0.01)
+            //     camera.rotateZ(state.clock.elapsedTime * 0.1)
             // }
-
-            if (chunk.confidence < 0.4) {
-                camera.rotateZ(state.clock.elapsedTime * 0.1)
-            }
         }
     )
 
-    const group = R.useRef(null!)
+    const group = R.useRef<T.Group>(null!)
 
     useMotions(
         { type: 'sections' },
@@ -182,18 +234,18 @@ export default function FlorScene({
             const [index] = current
             // changeDebugBeats(camera.position.z)
 
-            if (index == 0 && event == 'entering') {
-                /** acercarce */
-                camera.position.z = Math.cos(
-                    camera.position.z + state.clock.elapsedTime * 0.05
-                )
-            }
+            // if (index == 0 && event == 'entering') {
+            //     /** acercarce */
+            //     camera.position.z = Math.cos(
+            //         camera.position.z + state.clock.elapsedTime * 0.05
+            //     )
+            // }
 
-            if (index == 1 && event == 'leaving') {
-                camera.position.z = Math.cos(
-                    camera.position.z + state.clock.elapsedTime * 0.1
-                )
-            }
+            // if (index == 1 && event == 'leaving') {
+            //     camera.position.z = Math.cos(
+            //         camera.position.z + state.clock.elapsedTime * 0.1
+            //     )
+            // }
 
             if (index >= 1 && index < 8 && event == 'entering') {
                 const velocity = mapRange(
@@ -204,12 +256,12 @@ export default function FlorScene({
                         oMax: 0.6,
                     }
                 )
-                camera.position.z = Math.cos(
-                    camera.position.z + state.clock.elapsedTime * velocity
-                )
-                camera.position.x = Math.sin(
-                    camera.position.x + state.clock.elapsedTime * +velocity
-                )
+                // camera.position.z = Math.cos(
+                //     camera.position.z + state.clock.elapsedTime * velocity
+                // )
+                // camera.position.x = Math.sin(
+                //     camera.position.x + state.clock.elapsedTime * +velocity
+                // )
             }
 
             if (index >= 1 && index < 8 && event == 'leaving') {
@@ -221,19 +273,21 @@ export default function FlorScene({
                         oMax: 0.6,
                     }
                 )
-                camera.position.z = Math.cos(
-                    camera.position.z + state.clock.elapsedTime * velocity
-                )
-                camera.position.x = Math.sin(
-                    camera.position.x + state.clock.elapsedTime * -velocity
-                )
+                // camera.position.z = Math.cos(
+                //     camera.position.z + state.clock.elapsedTime * velocity
+                // )
+                // camera.position.x = Math.sin(
+                //     camera.position.x + state.clock.elapsedTime * -velocity
+                // )
             }
 
             if (index == 8 && event == 'entering') {
                 // console.log('alejarse')
                 group.current.rotateX(state.clock.elapsedTime * 0.0001)
-                camera.rotateZ(state.clock.elapsedTime * 0.5)
+                // camera.rotateZ(state.clock.elapsedTime * 0.5)
             }
+
+            // console.log(group.current.set)
             // if (index == 9 && event == 'leaving') {
             //     console.log('acercarse')
             //     /** acercarse come back*/
@@ -244,27 +298,17 @@ export default function FlorScene({
              */
 
             if (index >= 9 && index < 12 && event == 'entering') {
+                group.current.rotation.set(0, 0, 0)
+
                 const velocity =
                     2 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.1, oMax: 2 })
-                // changeDebugBeats(velocity)
-                camera.position.z = Math.cos(
-                    camera.position.z + state.clock.elapsedTime * velocity
-                )
-                // camera.position.x = Math.sin(
-                //     camera.position.x + state.clock.elapsedTime * +velocity
-                // )
+
             }
 
             if (index > 9 && index <= 12 && event == 'leaving') {
                 const velocity =
                     2 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.9, oMax: 2 })
-                // changeDebugBeats(velocity)
-                camera.position.z = Math.cos(
-                    camera.position.z + state.clock.elapsedTime * velocity
-                )
-                // camera.position.x = Math.sin(
-                //     camera.position.x + state.clock.elapsedTime * -velocity
-                // )
+
             }
         }
     )

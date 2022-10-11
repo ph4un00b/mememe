@@ -110,7 +110,7 @@ function LoadFlorecer() {
     } else if (tier == 3) {
         return <FlorScene tier={'high'} maxParticles={70_000} smallParticles={70_000} smallSize={0.25} bigSize={0.40} />
     } else if (tier < 2) {
-        return <FlorScene tier={'low'} maxParticles={2_500} smallParticles={2_000} smallSize={0.35} bigSize={0.40} />
+        return <FlorScene tier={'low'} maxParticles={2_500} smallParticles={2_000} smallSize={0.35} bigSize={0.65} />
     }
 }
 
