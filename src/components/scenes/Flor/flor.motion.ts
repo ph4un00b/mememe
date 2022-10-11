@@ -1,13 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import * as R from 'react'
 import * as F from '@react-three/fiber'
-import {
-    useDebugBeats,
-    useDebugParticles,
-    useDebugSections,
-    useDebugSegments,
-    useSongPosition,
-} from '@/helpers/store'
+import { useSongPosition } from '@/helpers/store'
 import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../../../music/florecer.json'
 import clone from 'lodash.clone'
@@ -40,7 +34,7 @@ type ParamsProps = {
     current?: [number, Beat | Section]
     chunk: Beat | Section
     state: F.RootState
-    event?: 'entering' | 'leaving'
+    event?: 'entering' | 'leaving' | 'ended'
 }
 
 export function useMotions(
@@ -84,6 +78,14 @@ export function useMotions(
             return
         }
         let [, cChunk] = currentChunk.current
+        if (!cChunk /** was last chunk */) {
+            frameCallback({
+                chunk: cChunk,
+                state,
+                current: currentChunk.current,
+                event: 'ended',
+            })
+        }
         if (!cChunk /** was last chunk */) return
 
         let cEnd = cChunk.start + cChunk.duration

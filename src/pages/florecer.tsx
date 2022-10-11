@@ -23,7 +23,6 @@ import {
 import { IfFeatureEnabled } from '@growthbook/growthbook-react'
 import florecerData from '../music/florecer.json'
 import * as D from '@react-three/drei'
-import { Text } from '@react-three/drei'
 // const Box = dynamic(() => import('@/components/canvas/Box'), {
 //     ssr: false,
 // })
@@ -31,13 +30,17 @@ let baseUrl = 'https://ph4un00b.github.io/data'
 
 function Page(props) {
     const [collapsed, setCollapsed] = R.useState(true)
+    const [ended, setEnd] = R.useState(false)
 
     const { togglePlayPause, ready, loading, playing } = useAudioPlayer({
         src: `${baseUrl}/florecer/source.mus`,
         format: 'mp3',
         autoplay: false,
         html5: false,
-        onend: () => X.log.debug('🌸', { sopa: '🎊💃' }),
+        onend: () => {
+            setEnd(true)
+            X.log.debug('🌸', { ended: true, sopa: '🎊💃' })
+        },
         // onseek: (e) => {
         //     console.log('cambiar!!')
 
@@ -73,12 +76,13 @@ function Page(props) {
                     <Debug />
                 </IfFeatureEnabled>
             </div>
+
             <Leva
                 // collapsed={{
                 //     collapsed: false,
                 //     onChange(c) { },
                 // }}
-                hidden={!true}
+                hidden={!ended}
             />
         </>
     )
@@ -105,12 +109,48 @@ Page.r3f = function (props) {
 function LoadFlorecer() {
     const { device, fps, gpu, isMobile, tier, type } = D.useDetectGPU()
 
+    R.useEffect(() => {
+        X.log.debug('🌸', {
+            device,
+            fps,
+            gpu,
+            isMobile,
+            tier,
+            type,
+            ipod: browser.isIpod(),
+        })
+    }, [])
+
     if (browser.isIpod() || tier == 2) {
-        return <FlorScene tier={'mid'} maxParticles={15_000} smallParticles={10_000} smallSize={0.25} bigSize={0.30} />
+        return (
+            <FlorScene
+                tier={'mid'}
+                maxParticles={15_000}
+                smallParticles={10_000}
+                smallSize={0.25}
+                bigSize={0.3}
+            />
+        )
     } else if (tier == 3) {
-        return <FlorScene tier={'high'} maxParticles={70_000} smallParticles={70_000} smallSize={0.25} bigSize={0.40} />
+        return (
+            <FlorScene
+                tier={'high'}
+                maxParticles={70_000}
+                smallParticles={70_000}
+                smallSize={0.25}
+                bigSize={0.4}
+            />
+        )
     } else if (tier < 2) {
-        return <FlorScene tier={'low'} maxParticles={2_500} smallParticles={2_000} smallSize={0.35} bigSize={0.65} />
+        return (
+            <FlorScene
+                tier={'low'}
+                maxParticles={2_500}
+                smallParticles={2_000}
+                smallSize={0.35}
+                bigSize={0.65}
+            />
+        )
     }
 }
 
@@ -132,7 +172,7 @@ function Debug() {
             <br />
             <span>particles: {dparticles}</span>
             {/* <br />
-                    <span>segments: {dsegments}</span> */}
+                            <span>segments: {dsegments}</span> */}
             <br />
             <span>sections: {dsection}</span>
             <br />

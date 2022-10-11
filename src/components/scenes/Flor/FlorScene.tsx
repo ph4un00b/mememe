@@ -3,17 +3,13 @@ import * as T from 'three'
 import * as L from 'leva'
 import * as F from '@react-three/fiber'
 import { useColoritos } from '@/utils/coloritos'
-import * as browser from '@/utils/browser'
-import { florControls } from './flor.controls'
 // @ts-ignore
 import vertexShader from './flor.vertex.glsl'
 import { fragmentShader } from './flor.frag'
 import { florAttributes } from './flor.attr'
 import { useMotions } from './flor.motion'
-import { useDebugBeats, useDebugParticles, useFPS } from '@/helpers/store'
+import { useDebugBeats, useDebugParticles } from '@/helpers/store'
 import { useAudioPosition } from 'react-use-audio-player'
-import { getGPUTier } from 'detect-gpu'
-import * as X from 'next-axiom'
 
 export default function FlorScene({
     maxParticles,
@@ -43,10 +39,9 @@ export default function FlorScene({
             leverE,
             leverR,
             leverR2,
-            gX,
-            rotateZ,
-            rotateX,
-            rotateY
+            // rotateZ,
+            // rotateX,
+            // rotateY
         },
         Lset,
     ] = L.useControls(() => ({
@@ -58,15 +53,14 @@ export default function FlorScene({
         },
         offset: { value: 0.0, min: 0, max: 1, step: 0.01 },
         leverC: { value: 1, min: 1, max: 20, step: 1 },
-        leverD: { value: 17, min: 0, max: 20, step: 1 },
+        leverD: { value: 2, min: 1, max: 20, step: 1 },
         leverE: { value: 1.68, min: 0, max: 2, step: 0.001 },
         leverCrazy: { value: 0.45, min: 0.01, max: 0.7, step: 0.01 },
         leverR: { value: 2.0, min: 0, max: 2, step: 0.001 },
         leverR2: { value: 10, min: 1, max: 10, strep: 0.001 },
-        gX: { value: 0, min: -1, max: 1, strep: 0.001 },
-        rotateZ: { value: 0, min: -0.5, max: 0.5, strep: 0.001 },
-        rotateX: { value: 0, min: -0.5, max: 0.5, strep: 0.001 },
-        rotateY: { value: 0, min: -0.5, max: 0.5, strep: 0.001 },
+        // rotateZ: { value: 0, min: -0.5, max: 0.5, strep: 0.001 },
+        // rotateX: { value: 0, min: -0.5, max: 0.5, strep: 0.001 },
+        // rotateY: { value: 0, min: -0.5, max: 0.5, strep: 0.001 },
         particles: {
             value: maxParticles,
             min: 0,
@@ -124,7 +118,7 @@ export default function FlorScene({
 
     const { camera } = F.useThree()
 
-    const { position } = useAudioPosition({
+    const { position, percentComplete } = useAudioPosition({
         highRefreshRate: true,
     })
 
@@ -167,20 +161,66 @@ export default function FlorScene({
         // points.current.translateZ(rotateZ)
     })
 
+    const currentSection = R.useRef(0)
+
     F.useFrame(({ clock }) => {
-        camera.position.z = Math.cos(
-            // despues incrementar a 1
-            camera.position.z + clock.elapsedTime * +0.1
-        )
-        camera.position.y = Math.sin(
-            // 1. incrementar a 1
-            camera.position.x + clock.elapsedTime * -0.1
-        )
+        if (percentComplete >= 100) return
+        // camera.position.z = Math.cos(
+        //     // despues incrementar a 1
+        //     camera.position.z + clock.elapsedTime * +2
+        // )
+        // camera.position.y = Math.sin(
+        //     // 1. incrementar a 1
+        //     camera.position.x + clock.elapsedTime * -2
+        // )
+
+        // [0, 8] [8, 11] -> [1,9] [9, 12] -> [0.1, 2] [2, 0.1]
+        if (currentSection.current >= 0 && currentSection.current < 8) {
+            // we can precalculate this below if needed
+            const val = mapRange(
+                currentSection.current,
+                { iMin: 0, iMax: 8 },
+                {
+                    oMin: 0.1,
+                    oMax: 0.8,
+                }
+            )
+
+            camera.position.z = Math.cos(
+                // despues incrementar a 1
+                camera.position.z + clock.elapsedTime * +val
+            )
+            camera.position.y = Math.sin(
+                // 1. incrementar a 1
+                camera.position.x + clock.elapsedTime * -val
+            )
+        }
+
+        if (currentSection.current >= 8 && currentSection.current < 11) {
+            // we can precalculate this below if needed
+            const val = 1.5 - mapRange(
+                currentSection.current,
+                { iMin: 8, iMax: 11 },
+                {
+                    oMin: 0.1,
+                    oMax: 1.5,
+                }
+            )
+
+            camera.position.z = Math.cos(
+                // despues incrementar a 1
+                camera.position.z + clock.elapsedTime * +val
+            )
+            camera.position.y = Math.sin(
+                // 1. incrementar a 1
+                camera.position.x + clock.elapsedTime * +val
+            )
+        }
     })
 
     F.useFrame(({ clock }) => {
+        if (percentComplete >= 100) return
         camera.rotateZ(clock.elapsedTime * 0.1)
-        // console.log(clock.elapsedTime * 0.1)
     })
 
 
@@ -211,43 +251,35 @@ export default function FlorScene({
                     Lset({ leverCrazy: 0.15 * 0.45 + Math.random() * 0.3 })
                 }
             }
+
+            if (currentSection.current == 8) {
+                // try group
+                if (chunk.confidence < 0.4) {
+                    Lset({ leverD: Math.floor(1 + Math.random() * 8) })
+                    //     camera.rotateZ(state.clock.elapsedTime * 0.1)
+                }
+
+            }
         },
         function frameCallback({ chunk, state, current }) {
-            // try group
-            // if (chunk.confidence < 0.4) {
-            //     camera.rotateZ(state.clock.elapsedTime * 0.1)
-            // }
+
         }
     )
 
-    const group = R.useRef<T.Group>(null!)
 
+    const group = R.useRef<T.Group>(null!)
     useMotions(
         { type: 'sections' },
         function beforeLeaveCallback({ next, current }) {
-            console.log('beforeLeaveCallback', current)
+
         },
         function enterCallback({ chunk, state, current }) {
-            console.log('enterCallback', current)
+
         },
         function frameCallback({ chunk, state, current, event }) {
             const [index] = current
-            // changeDebugBeats(camera.position.z)
 
-            // if (index == 0 && event == 'entering') {
-            //     /** acercarce */
-            //     camera.position.z = Math.cos(
-            //         camera.position.z + state.clock.elapsedTime * 0.05
-            //     )
-            // }
-
-            // if (index == 1 && event == 'leaving') {
-            //     camera.position.z = Math.cos(
-            //         camera.position.z + state.clock.elapsedTime * 0.1
-            //     )
-            // }
-
-            if (index >= 1 && index < 8 && event == 'entering') {
+            if (index >= 0 && index < 8 && event == 'entering') {
                 const velocity = mapRange(
                     index,
                     { iMin: 0, iMax: 7 },
@@ -256,15 +288,11 @@ export default function FlorScene({
                         oMax: 0.6,
                     }
                 )
-                // camera.position.z = Math.cos(
-                //     camera.position.z + state.clock.elapsedTime * velocity
-                // )
-                // camera.position.x = Math.sin(
-                //     camera.position.x + state.clock.elapsedTime * +velocity
-                // )
+
+                Lset({ leverD: index + 1 })
             }
 
-            if (index >= 1 && index < 8 && event == 'leaving') {
+            if (index >= 0 && index < 8 && event == 'leaving') {
                 const velocity = mapRange(
                     index,
                     { iMin: 0, iMax: 7 },
@@ -273,18 +301,12 @@ export default function FlorScene({
                         oMax: 0.6,
                     }
                 )
-                // camera.position.z = Math.cos(
-                //     camera.position.z + state.clock.elapsedTime * velocity
-                // )
-                // camera.position.x = Math.sin(
-                //     camera.position.x + state.clock.elapsedTime * -velocity
-                // )
+
             }
 
             if (index == 8 && event == 'entering') {
-                // console.log('alejarse')
-                group.current.rotateX(state.clock.elapsedTime * 0.0001)
-                // camera.rotateZ(state.clock.elapsedTime * 0.5)
+                currentSection.current = 8
+                group.current.rotateX(state.clock.elapsedTime * 0.00007)
             }
 
             // console.log(group.current.set)
@@ -303,6 +325,7 @@ export default function FlorScene({
                 const velocity =
                     2 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.1, oMax: 2 })
 
+                Lset({ leverD: index + 5 })
             }
 
             if (index > 9 && index <= 12 && event == 'leaving') {
