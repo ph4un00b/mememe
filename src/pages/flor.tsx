@@ -5,7 +5,10 @@ import * as meta from '@/config'
 import { PerspectiveCamera } from '@react-three/drei'
 import * as X from 'next-axiom'
 import { Leva } from 'leva'
-import { FlorTop, Instructions } from '@/components/dom/Instructions'
+import { FlorTop } from '@/components/dom/Instructions'
+import * as R from 'react'
+import * as browser from '@/utils/browser'
+import * as D from '@react-three/drei'
 
 const Box = dynamic(() => import('@/components/canvas/Box'), {
     ssr: false,
@@ -33,7 +36,7 @@ Page.r3f = (props) => (
             makeDefault={true}
         />
 
-        <FlorScene />
+        <LoadFlorecer />
         {/* <axesHelper args={[8]} /> */}
     </>
 )
@@ -45,5 +48,54 @@ export async function getStaticProps() {
         props: {
             title: `🌺Flor GLSL- ${meta.titleDefault}`,
         },
+    }
+}
+
+
+function LoadFlorecer() {
+    const { device, fps, gpu, isMobile, tier, type } = D.useDetectGPU()
+
+    R.useEffect(() => {
+        X.log.debug('🌸', {
+            device,
+            fps,
+            gpu,
+            isMobile,
+            tier,
+            type,
+            ipod: browser.isIpod(),
+        })
+    }, [])
+
+    if (browser.isIpod() || tier == 2) {
+        return (
+            <FlorScene
+                tier={'mid'}
+                maxParticles={15_000}
+                smallParticles={10_000}
+                smallSize={0.25}
+                bigSize={0.3}
+            />
+        )
+    } else if (tier == 3) {
+        return (
+            <FlorScene
+                tier={'high'}
+                maxParticles={70_000}
+                smallParticles={70_000}
+                smallSize={0.25}
+                bigSize={0.4}
+            />
+        )
+    } else if (tier < 2) {
+        return (
+            <FlorScene
+                tier={'low'}
+                maxParticles={2_500}
+                smallParticles={2_000}
+                smallSize={0.35}
+                bigSize={0.65}
+            />
+        )
     }
 }
