@@ -35,6 +35,48 @@ button.cyberpunk {
 
 button.cyberpunk:hover {
   box-shadow: none;
-  background-color: transparent;
+  background-color: #bebebe;
+  color: white;
+}
+
+button.sections {
+  width: 140px;
+  height: 40px;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  background-color: rgb(101, 99, 251);
+  border: none;
+  outline: none;  
+  box-shadow: 4px -2px 0px 0px #ebebeb;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+button.sections:hover {
+  box-shadow: none;
+  background-color: #bebebe;
+  color: white;
+}
+
+button.bars {
+  width: 140px;
+  height: 40px;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  background-color: rgb(249, 85, 52);
+  border: none;
+  outline: none;  
+  box-shadow: 4px -2px 0px 0px #ebebeb;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+button.bars:hover {
+  box-shadow: none;
+  background-color: #bebebe;
   color: white;
 }
