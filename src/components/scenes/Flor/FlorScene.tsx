@@ -6,7 +6,7 @@ import { createColorsArray } from '@/utils/coloritos'
 // @ts-ignore
 import vertexShader from './flor.vertex.glsl'
 import { fragmentShader } from './flor.frag'
-import { florAttributes } from './flor.attr'
+import { createAttributes } from './flor.attr'
 import { useTriggerChangeColor } from '@/helpers/store'
 import { useSceneMotions } from './flor.effects'
 
@@ -111,7 +111,7 @@ export default function FlorScene({
     }, [colorChangeRequested])
 
     const arrays = R.useMemo(() => {
-        return florAttributes(
+        return createAttributes(
             particles,
             niceColors,
             leverCrazy,

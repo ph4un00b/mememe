@@ -1,6 +1,6 @@
 import * as T from 'three'
 
-export function florAttributes(
+export function createAttributes(
     particles: number,
     niceColors: string[],
     leverCrazy: number,
