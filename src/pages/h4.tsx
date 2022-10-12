@@ -16,6 +16,7 @@ const Page = (props) => {
     const { togglePlayPause: t4, ready: r4, loading: l4 } = useAudioPlayer({
         src: `${baseUrl}/casa/source.mus`,
         format: 'mp3',
+        autoplay: false,
         html5: true,
         onend: () => {
             setEnd(true)
@@ -27,7 +28,11 @@ const Page = (props) => {
         <>
             <button
                 className='cyberpunk'
-                onClick={() => {
+                onTouchStart={() => {
+                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
+                    t4()
+                }}
+                onMouseUp={() => {
                     X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
                     t4()
                 }}

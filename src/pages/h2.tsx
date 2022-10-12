@@ -30,7 +30,11 @@ const Page = (props) => {
 
             <button
                 className='cyberpunk'
-                onClick={() => {
+                onTouchStart={() => {
+                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
+                    t2()
+                }}
+                onMouseUp={() => {
                     X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
                     t2()
                 }}

@@ -37,6 +37,7 @@ const Page = (props) => {
     const { togglePlayPause: t3, ready: r3, loading: l3 } = useAudioPlayer({
         src: `${baseUrl}/casa/source.mus`,
         format: 'mp3',
+        autoplay: false,
         html5: true,
         onend: () => {
             setEnd(true)
@@ -47,6 +48,7 @@ const Page = (props) => {
     const { togglePlayPause: t4, ready: r4, loading: l4 } = useAudioPlayer({
         src: `${baseUrl}/casa/source.mus`,
         format: 'mp3',
+        autoplay: true,
         html5: true,
         onend: () => {
             setEnd(true)
@@ -58,6 +60,14 @@ const Page = (props) => {
         <>
             <button
                 className='cyberpunk'
+                onTouchStart={() => {
+                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
+                    togglePlayPause()
+                }}
+                onMouseUp={() => {
+                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
+                    togglePlayPause()
+                }}
                 onClick={() => {
                     X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
                     togglePlayPause()

@@ -6,41 +6,55 @@ import hausData from '../music/haus.json'
 import * as X from 'next-axiom'
 import * as R from 'react'
 import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
-
+import { useRoover } from 'roover'
 let baseUrl = 'https://ph4un00b.github.io/data'
 
 const Page = (props) => {
     const [ended, setEnd] = R.useState(false)
 
-    const { togglePlayPause: t3, ready: r3, loading: l3 } = useAudioPlayer({
+    const {
+        initial,
+        loading,
+        ready,
+        playing,
+        paused,
+        onPlay,
+        onPause,
+    } = useRoover({
         src: `${baseUrl}/casa/source.mus`,
-        format: 'mp3',
         autoplay: true,
-        html5: true,
-        onend: () => {
-            setEnd(true)
-            X.log.debug('🏡', { ended: true, sopa: 'termino 🎊💃' })
-        }
-    })
-
-
+    });
 
     return (
         <>
-
             <button
                 className='cyberpunk'
                 onTouchStart={() => {
                     X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
-                    t3()
-                }}
-                onMouseUp={() => {
-                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
-                    t3()
+                    onPlay()
                 }}
             >
-                {!r3 && !l3 ? 'Loading3' : 'Play3'}
+                {!ready && !loading ? 'Play' : 'Play touch'}
             </button>
+            <button
+                className='cyberpunk'
+                onMouseUp={() => {
+                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
+                    onPlay()
+                }}
+            >
+                {!ready && !loading ? 'Play' : 'Play Mouse'}
+            </button>
+            <button
+                className='cyberpunk'
+                onClick={() => {
+                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
+                    onPlay()
+                }}
+            >
+                {!ready && !loading ? 'Play' : 'Play Click'}
+            </button>
+            <Debug />
         </>
     )
 }
