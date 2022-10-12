@@ -1,3 +1,4 @@
+/* eslint-disable no-var */
 import * as T from 'three'
 import * as React from 'react'
 import {
@@ -30,7 +31,7 @@ let Drums: HTMLAudioElement
 let Music: HTMLAudioElement
 let audioContext: AudioContext,
     audioData: Uint8Array,
-    sourceNode: AudioScheduledSourceNode,
+    sourceNode: AudioBufferSourceNode,
     soundAnalyzer: AnalyserNode
 
 // export default function () {
@@ -270,8 +271,9 @@ function GridCubeMeshLines({ segmentos = 15 }) {
 
     useFrame(() => {
         geometry.setGeometry(
-            createSquareGeometry({ size: size.current, scale })
-            // (p) => {},
+            // @ts-ignore
+            createSquareGeometry({ size: size.current, scale }),
+            (p) => 1,
         )
         drawWithAudio()
         rerender({}) // best way to do this?
@@ -309,8 +311,27 @@ line.setGeometry(
 )
 var geometry = line.geometry
 
-let materialArgs = {
+let materialArgs: {
+    lineWidth?: number,
+    map?: T.Texture,
+    useMap?: number,
+    alphaMap?: T.Texture,
+    useAlphaMap?: number,
+    color?: string | T.Color | number,
+    opacity?: number,
+    resolution: T.Vector2, // required???????????
+    sizeAttenuation?: number,
+    dashArray?: number,
+    dashOffset?: number,
+    dashRatio?: number,
+    useDash?: number,
+    visibility?: number,
+    alphaTest?: number,
+    repeat?: T.Vector2,
+    transparent: boolean
+} = {
     transparent: false,
+    resolution: new T.Vector2(1, 1),
     lineWidth: 0.1,
     color: new T.Color(0xff0000),
     dashArray: 1, // always has to be the double of the line
@@ -396,6 +417,7 @@ async function createAudio() {
     // audioContext = new AudioContext({ sampleRate: 44100 });
 
     sourceNode = audioContext.createBufferSource()
+    // @ts-ignore
     sourceNode.buffer = audioBuffer
     sourceNode.connect(audioContext.destination)
     // sampleSource.start(0);
@@ -411,16 +433,16 @@ async function createAudio() {
     audioData = new Uint8Array(soundAnalyzer.frequencyBinCount)
 }
 
-function createSimpleAudio(track: string) {
-    const audio = document.createElement('audio')
-    audio.src = `audio/${track}`
-    audioContext = new AudioContext()
+// function createSimpleAudio(track: string) {
+//     const audio = document.createElement('audio')
+//     audio.src = `audio/${track}`
+//     audioContext = new AudioContext()
 
-    sourceNode = audioContext.createMediaElementSource(audio)
-    sourceNode.connect(audioContext.destination)
+//     sourceNode = audioContext.createMediaElementSource(audio)
+//     sourceNode.connect(audioContext.destination)
 
-    return audio
-}
+//     return audio
+// }
 
 /** @link https://abarrafato.medium.com/building-a-real-time-spectrum-analyzer-plot-using-html5-canvas-web-audio-api-react-46a495a06cbf */
 function frequencyToXAxis(frequency: number) {

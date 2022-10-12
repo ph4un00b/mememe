@@ -128,3 +128,17 @@ declare module '@react-three/fiber' {
 const AguaMat = D.shaderMaterial({ utime: 0 }, vertex, frag)
 
 F.extend({ AguaMat }) // -> now you can do <aguaMat ... />
+
+declare namespace JSX {
+    interface IntrinsicElements {
+        aguaMat: any
+    }
+}
+
+declare global {
+    namespace JSX {
+        interface IntrinsicElements {
+            aguaMat: F.Object3DNode<ShaderProps, typeof AguaMat>;
+        }
+    }
+}
