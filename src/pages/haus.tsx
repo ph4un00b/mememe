@@ -23,84 +23,16 @@ const Page = (props) => {
         }
     })
 
-    const { togglePlayPause: t2, ready: r2, loading: l2 } = useAudioPlayer({
-        src: `${baseUrl}/casa/source.mus`,
-        format: 'mp3',
-        autoplay: true,
-        html5: false,
-        onend: () => {
-            setEnd(true)
-            X.log.debug('🏡', { ended: true, sopa: 'termino 🎊💃' })
-        }
-    })
-
-    const { togglePlayPause: t3, ready: r3, loading: l3 } = useAudioPlayer({
-        src: `${baseUrl}/casa/source.mus`,
-        format: 'mp3',
-        autoplay: false,
-        html5: true,
-        onend: () => {
-            setEnd(true)
-            X.log.debug('🏡', { ended: true, sopa: 'termino 🎊💃' })
-        }
-    })
-
-    const { togglePlayPause: t4, ready: r4, loading: l4 } = useAudioPlayer({
-        src: `${baseUrl}/casa/source.mus`,
-        format: 'mp3',
-        autoplay: true,
-        html5: true,
-        onend: () => {
-            setEnd(true)
-            X.log.debug('🏡', { ended: true, sopa: 'termino 🎊💃' })
-        }
-    })
 
     return (
         <>
             <button
-                className='cyberpunk'
-                onTouchStart={() => {
-                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
-                    togglePlayPause()
-                }}
-                onMouseUp={() => {
-                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
-                    togglePlayPause()
-                }}
                 onClick={() => {
                     X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
                     togglePlayPause()
                 }}
             >
                 {!ready && !loading ? 'Loading' : 'Play'}
-            </button>
-            <button
-                className='cyberpunk'
-                onClick={() => {
-                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
-                    t2()
-                }}
-            >
-                {!r2 && !l2 ? 'Loading2' : 'Play2'}
-            </button>
-            <button
-                className='cyberpunk'
-                onClick={() => {
-                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
-                    t3()
-                }}
-            >
-                {!r3 && !l3 ? 'Loading3' : 'Play3'}
-            </button>
-            <button
-                className='cyberpunk'
-                onClick={() => {
-                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
-                    t3()
-                }}
-            >
-                {!r4 && !l4 ? 'Loading4' : 'Play4'}
             </button>
             <Debug />
         </>

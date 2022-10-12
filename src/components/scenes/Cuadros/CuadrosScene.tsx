@@ -81,7 +81,6 @@ function ContainerGrid({
     translateX: number
     translateY: number
 }) {
-
     const playing = React.useRef(false)
     useEventListener('click', async (e: any) => {
         // ctrl + space
@@ -90,10 +89,9 @@ function ContainerGrid({
             await createAudio()
             sourceNode.start()
             // Music = createSimpleAudio("nachas2.mp3");
-        }
-        else {
+        } else {
             if (audioContext.state == 'suspended') {
-                await audioContext.resume();
+                await audioContext.resume()
                 // sourceNode.start(0)
             }
         }
@@ -108,7 +106,7 @@ function ContainerGrid({
             // })
         } else {
             playing.current = false
-            await audioContext.suspend();
+            await audioContext.suspend()
             // sourceNode.s
         }
 
@@ -180,11 +178,11 @@ function Square2D({
             args={[geometry, material]}
         >
             {/* <meshLine attach="
-               geometry" points={points} />
-            <meshLineMaterial
-              attach="material"
-              args={[materialArgs]}
-            /> */}
+                       geometry" points={points} />
+                    <meshLineMaterial
+                      attach="material"
+                      args={[materialArgs]}
+                    /> */}
         </mesh>
     )
 }
@@ -273,7 +271,7 @@ function GridCubeMeshLines({ segmentos = 15 }) {
         geometry.setGeometry(
             // @ts-ignore
             createSquareGeometry({ size: size.current, scale }),
-            (p) => 1,
+            (p) => 1
         )
         drawWithAudio()
         rerender({}) // best way to do this?
@@ -312,22 +310,22 @@ line.setGeometry(
 var geometry = line.geometry
 
 let materialArgs: {
-    lineWidth?: number,
-    map?: T.Texture,
-    useMap?: number,
-    alphaMap?: T.Texture,
-    useAlphaMap?: number,
-    color?: string | T.Color | number,
-    opacity?: number,
-    resolution: T.Vector2, // required???????????
-    sizeAttenuation?: number,
-    dashArray?: number,
-    dashOffset?: number,
-    dashRatio?: number,
-    useDash?: number,
-    visibility?: number,
-    alphaTest?: number,
-    repeat?: T.Vector2,
+    lineWidth?: number
+    map?: T.Texture
+    useMap?: number
+    alphaMap?: T.Texture
+    useAlphaMap?: number
+    color?: string | T.Color | number
+    opacity?: number
+    resolution: T.Vector2 // required???????????
+    sizeAttenuation?: number
+    dashArray?: number
+    dashOffset?: number
+    dashRatio?: number
+    useDash?: number
+    visibility?: number
+    alphaTest?: number
+    repeat?: T.Vector2
     transparent: boolean
 } = {
     transparent: false,
@@ -403,11 +401,36 @@ function mapRange(
     }
 }
 
+function unlockAudioContextBoilerplate(context: AudioContext) {
+    if (context.state != 'suspended') return
+    const body = document.body
+    const events = ['touchstart', 'touchend', 'mousedown', 'keydown']
+    events.forEach((e) => body.addEventListener(e, unlockAudio, false))
+    function unlockAudio() {
+        context.resume().then(removeEvents)
+    }
+    function removeEvents() {
+        events.forEach((e) => body.removeEventListener(e, unlockAudio))
+    }
+}
+
 async function createAudio() {
     let baseUrl = 'https://ph4un00b.github.io/data'
+    const AudioContext =
+        window.AudioContext || // Default
+        // @ts-ignore
+        window.webkitAudioContext || // Safari and old versions of Chrome
+        false
+
+    if (!AudioContext) {
+        alert('not supported browser :(')
+        return
+    }
 
     audioContext = new AudioContext({ sampleRate: 44100 })
-    const response = await fetch(`${baseUrl}/casa/source.mus`)
+    unlockAudioContextBoilerplate(audioContext)
+    // const response = await fetch(`${baseUrl}/casa/source.mus`)
+    const response = await fetch(`./music/nat2.mp3`)
     const arrayBuffer = await response.arrayBuffer()
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
 

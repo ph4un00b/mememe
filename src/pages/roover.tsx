@@ -29,24 +29,6 @@ const Page = (props) => {
         <>
             <button
                 className='cyberpunk'
-                onTouchStart={() => {
-                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
-                    onPlay()
-                }}
-            >
-                {!ready && !loading ? 'Play' : 'Play touch'}
-            </button>
-            <button
-                className='cyberpunk'
-                onMouseUp={() => {
-                    X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
-                    onPlay()
-                }}
-            >
-                {!ready && !loading ? 'Play' : 'Play Mouse'}
-            </button>
-            <button
-                className='cyberpunk'
                 onClick={() => {
                     X.log.debug('🏡', { sopa: 'toggle musique 🎼' })
                     onPlay()

@@ -16,6 +16,7 @@
     "glsl-random": "^0.0.5",
     "leva": "^0.9.31",
     "lodash.clone": "^4.5.0",
+    "media-chrome": "^0.14.0",
     "meshline": "^2.0.4",
     "next": "^12.3.0",
     "next-axiom": "^0.14.0",
