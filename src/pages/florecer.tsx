@@ -81,17 +81,17 @@ function Page(props) {
 
     return (
         <>
-            <div
-                // eslint-disable-next-line tailwind/class-order
-                className='absolute max-w-lg px-4 py-2 text-sm transform -translate-x-1/2 bg-gray-900 shadow-xl select-none md:text-base top-8 left-1/2 text-gray-50'
-                style={{
-                    maxWidth: 'calc(100% - 28px)',
-                }}
-            >
-                <IfFeatureEnabled feature='florecer-debug'>
+            <IfFeatureEnabled feature='florecer-debug'>
+                <div
+                    // eslint-disable-next-line tailwind/class-order
+                    className='absolute max-w-lg px-4 py-2 text-sm transform -translate-x-1/2 bg-gray-900 shadow-xl select-none md:text-base top-8 left-1/2 text-gray-50'
+                    style={{
+                        maxWidth: 'calc(100% - 28px)',
+                    }}
+                >
                     <Debug sound={sound} />
-                </IfFeatureEnabled>
-            </div>
+                </div>
+            </IfFeatureEnabled>
 
             <div
                 // eslint-disable-next-line tailwind/class-order
@@ -139,7 +139,7 @@ function Page(props) {
                 //     collapsed: false,
                 //     onChange(c) { },
                 // }}
-                hidden={ended}
+                hidden={!ended}
             />
         </>
     )
