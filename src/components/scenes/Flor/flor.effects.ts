@@ -150,7 +150,7 @@ export function useSceneMotions(
         },
         function frameCallback({ chunk, state, current }) {
             if (chunk?.confidence < 0.4) {
-                // will stop rotation at the end
+                // will stop rotation at the end of the song
                 camera.rotateZ(state.clock.elapsedTime * 1)
             }
         }
