@@ -20,6 +20,18 @@ import {
 import { IfFeatureEnabled } from '@growthbook/growthbook-react'
 import florecerData from '../music/florecer.json'
 import * as D from '@react-three/drei'
+import {
+    MediaControlBar,
+    MediaController,
+    MediaFullscreenButton,
+    MediaLoadingIndicator,
+    MediaMuteButton,
+    MediaPlaybackRateButton,
+    MediaPlayButton,
+    MediaTimeDisplay,
+    MediaTimeRange,
+    MediaVolumeRange,
+} from 'media-chrome/dist/react'
 // const Box = dynamic(() => import('@/components/canvas/Box'), {
 //     ssr: false,
 // })
@@ -74,43 +86,50 @@ function Page(props) {
                     maxWidth: 'calc(100% - 28px)',
                 }}
             >
-                <audio
-                    ref={sound}
-                    loop={false}
-                    id='music'
-                    preload='auto'
-                    style={{ display: 'none' }}
-                >
-                    {/* <source src='music/nat2.mp3' type='audio/mpeg' /> */}
-                    <source src={`${baseUrl}/florecer/source.mus`} type='audio/mpeg' />
-                </audio>
-
-                <button
-                    className='cyberpunk'
-                    onClick={() => {
-                        if (!started.current) {
-                            sound.current.play()
-                        } else {
-                            sound.current.pause()
-                        }
-                    }}
-                >
-                    Nat
-                </button>
-
-                <button
-                    className='cyberpunk'
-                    onClick={() => {
-                        X.log.debug('🌸', { sopa: 'change color 🌈' })
-                        triggerColorChange()
-                    }}
-                >
-                    Color
-                </button>
-
                 <IfFeatureEnabled feature='florecer-debug'>
                     <Debug sound={sound} />
                 </IfFeatureEnabled>
+            </div>
+
+            <div
+                // eslint-disable-next-line tailwind/class-order
+                className='absolute w-full px-4 py-2 text-sm transform -translate-x-1/2 bg-transparent shadow-xl select-none bottom-2 md:text-base left-1/2 text-gray-50'
+                style={{
+                    maxWidth: 'calc(100% - 28px)',
+                    // backgroundColor: '#20202b',
+                    borderBottom: 'solid 2px #97eab4',
+                }}
+            >
+                <div className='flex flex-row justify-center bg-transparent'>
+                    {/* hola */}
+                    <MediaPlayer
+                        colorButton={
+                            <button
+                                className='cyberpunk'
+                                onClick={() => {
+                                    X.log.debug('🌸', { sopa: 'change color 🌈' })
+                                    triggerColorChange()
+                                }}
+                            >
+                                Color
+                            </button>
+                        }
+                    >
+                        <audio
+                            slot='media'
+                            ref={sound}
+                            loop={false}
+                            preload='auto'
+                        // style={{ display: 'none' }}
+                        >
+                            {/* <source src='music/nat2.mp3' type='audio/mpeg' /> */}
+                            <source
+                                src={`${baseUrl}/florecer/source.mus`}
+                                type='audio/mpeg'
+                            />
+                        </audio>
+                    </MediaPlayer>
+                </div>
             </div>
 
             <Leva
@@ -339,7 +358,7 @@ function Debug({ sound }: { sound: R.MutableRefObject<HTMLAudioElement> }) {
             <br />
             <span>particles: {dparticles}</span>
             {/* <br />
-                                                                            <span>segments: {dsegments}</span> */}
+                                                                                    <span>segments: {dsegments}</span> */}
             <br />
             <span>sections: {dsection}</span>
             <br />
@@ -357,6 +376,51 @@ function Debug({ sound }: { sound: R.MutableRefObject<HTMLAudioElement> }) {
                     </button>
                 )
             })}
+        </>
+    )
+}
+
+function MediaPlayer({ children, colorButton }) {
+    /*
+           * maybe ping mux? as showcase?
+          /*
+           * maybe ping r3f? as showcase?
+           */
+    return (
+        <>
+            <MediaController
+                MediaController
+                audio
+                // @link https://media-chrome-docs.vercel.app/en/styling
+                style={{
+                    '--media-control-background': 'rgba(0,0,0,0.5)',
+                }}
+            >
+                {children}
+                {/* <audio
+                              slot='media'
+                              src='https://stream.mux.com/O4h5z00885HEucNNa1rV02wZapcGp01FXXoJd35AHmGX7g/audio.m4a'
+                          /> */}
+                <MediaControlBar>
+                    {/* <MediaLoadingIndicator /> */}
+                    {/* @link https://media-chrome-docs.vercel.app/en/keyboard-shortcuts
+           * preventing seek
+           */}
+                    <MediaPlayButton keysused={'Space'} />
+                    <MediaTimeDisplay show-duration={false} />
+                    {/* <MediaTimeRange /> */}
+                    {/* <MediaPlaybackRateButton /> */}
+                    <MediaMuteButton />
+                    <MediaVolumeRange />
+                    {/*
+           * media-only <MediaFullscreenButton />
+           * //todo: we should offer a fullscren option for the whole visual
+           */}
+                    {/* <MediaFullscreenButton /> */}
+                </MediaControlBar>
+            </MediaController>
+
+            {colorButton}
         </>
     )
 }
