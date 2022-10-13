@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import dynamic from 'next/dynamic'
 import FlorScene from '@/components/scenes/Flor/FlorScene'
 import * as meta from '@/config'
@@ -8,9 +9,11 @@ import * as hooks from '@/utils/hooks'
 import * as R from 'react'
 import * as browser from '@/utils/browser'
 import {
+    useAudioStatus,
     useDebugBeats,
     useDebugParticles,
     useDebugSections,
+    useSeekPosition,
     useSongPosition,
     useTriggerChangeColor,
 } from '@/helpers/store'
@@ -37,18 +40,23 @@ function Page(props) {
     const sound = R.useRef<HTMLAudioElement>(null!)
     const started = R.useRef(false)
     const [, setSongPosition] = useSongPosition()
+    const [, setPlaying] = useAudioStatus()
+
     useAudioHooks(sound, {
         onended: () => {
             setEnd(true)
             X.log.debug('🌸', { ended: true, sopa: 'termino 🎊💃' })
+            setPlaying(false)
         },
         onpause: () => {
             started.current = false
             X.log.debug('🌸', { sopa: 'pause musique 🎼' })
+            setPlaying(false)
         },
         onplay: () => {
             started.current = true
             X.log.debug('🌸', { sopa: 'play musique 🎼' })
+            setPlaying(true)
         },
         onchanged: (e) => {
             // console.log(sound.current.currentTime)
@@ -100,10 +108,9 @@ function Page(props) {
                     Color
                 </button>
 
-                {/* <IfFeatureEnabled feature='florecer-debug'>
-                                                            <Debug />
-                                                        </IfFeatureEnabled> */}
-                <Debug sound={sound} />
+                <IfFeatureEnabled feature='florecer-debug'>
+                    <Debug sound={sound} />
+                </IfFeatureEnabled>
             </div>
 
             <Leva
@@ -111,7 +118,7 @@ function Page(props) {
                 //     collapsed: false,
                 //     onChange(c) { },
                 // }}
-                hidden={!ended}
+                hidden={ended}
             />
         </>
     )
@@ -141,7 +148,7 @@ function useAudioHooks(
         onended,
         onpause,
         onplay,
-        onchanged
+        onchanged,
     }: {
         onended: (e) => void
         onpause: (e) => void
@@ -332,7 +339,7 @@ function Debug({ sound }: { sound: R.MutableRefObject<HTMLAudioElement> }) {
             <br />
             <span>particles: {dparticles}</span>
             {/* <br />
-                                                            <span>segments: {dsegments}</span> */}
+                                                                            <span>segments: {dsegments}</span> */}
             <br />
             <span>sections: {dsection}</span>
             <br />
@@ -340,7 +347,7 @@ function Debug({ sound }: { sound: R.MutableRefObject<HTMLAudioElement> }) {
                 return (
                     <button
                         onClick={() => {
-                            changePosition(section.start)
+                            seekPosition(section.start)
                             sound.current.currentTime = section.start
                         }}
                         className='cyberpunk'

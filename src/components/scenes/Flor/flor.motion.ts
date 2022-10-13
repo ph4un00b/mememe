@@ -1,7 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import * as R from 'react'
 import * as F from '@react-three/fiber'
-import { useSongPosition } from '@/helpers/store'
+import {
+    useAudioStatus,
+    useSeekPosition,
+    useSongPosition,
+} from '@/helpers/store'
 import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../../../music/florecer.json'
 import clone from 'lodash.clone'
@@ -54,11 +58,9 @@ export function useMotions(
     }, [])
 
     const inMotion = R.useRef(false)
-    const [newPosition] = useSongPosition()
-    const { playing: songPlaying } = useAudioPlayer()
-    const { position: songPosition } = useAudioPosition({
-        highRefreshRate: true,
-    })
+    const [seekedPosition] = useSeekPosition()
+    const [songPlaying] = useAudioStatus()
+    const [songPosition] = useSongPosition()
     let currentChunk = R.useRef<[number, Beat | Section]>([0, analysis[type][0]])
 
     R.useEffect(() => {
@@ -68,9 +70,10 @@ export function useMotions(
          * @todo find a better way?
          */
         // inMotion.current = false
-    }, [newPosition])
+    }, [seekedPosition])
 
     F.useFrame((state) => {
+        // console.log({ songPlaying, songPosition })
         if (!(songPosition > 0) || !songPlaying) {
             return
         }

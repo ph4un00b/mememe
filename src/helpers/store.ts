@@ -81,7 +81,7 @@ const useStoreImpl = create<MyGlobalState>((set) => {
         // console.log(`prev`, prev)
         return {
           ...prev,
-          seekedPosition: val,
+          seekedPosition: prev.seekedPosition + 1,
         }
       })
     },
@@ -145,6 +145,12 @@ export function useSongPosition() {
   return [state, setState] as const
 }
 
+export function useSeekPosition() {
+  const state = useStore((state) => state.seekedPosition)
+  const setState = useStore((state) => state.seekSongPosition)
+  return [state, setState] as const
+}
+
 export function useAudioStatus() {
   const state = useStore((state) => state.isSongPlaying)
   const setState = useStore((state) => state.setIsSongPlaying)
@@ -157,8 +163,6 @@ export function useTriggerChangeColor() {
   const setState = useStore((state) => state.changeColors)
   return [state, setState] as const
 }
-
-
 
 export { getState, setState }
 export default useStore
