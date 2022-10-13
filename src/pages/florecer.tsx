@@ -13,6 +13,7 @@ import {
     useDebugBeats,
     useDebugParticles,
     useDebugSections,
+    useGlobalColors,
     useSeekPosition,
     useSongPosition,
     useTriggerChangeColor,
@@ -49,6 +50,7 @@ function Page(props) {
     }, 3210)
 
     const [, triggerColorChange] = useTriggerChangeColor()
+    const [florColor] = useGlobalColors()
     const sound = R.useRef<HTMLAudioElement>(null!)
     const started = R.useRef(false)
     const [, setSongPosition] = useSongPosition()
@@ -93,19 +95,17 @@ function Page(props) {
 
             <div
                 // eslint-disable-next-line tailwind/class-order
-                className='absolute w-full px-4 py-2 text-sm transform -translate-x-1/2 bg-transparent shadow-xl select-none bottom-2 md:text-base left-1/2 text-gray-50'
+                className='absolute px-0 pb-[1px] text-sm transform -translate-x-1/2 shadow-xl select-none bottom-2 md:text-base left-1/2 text-gray-50'
                 style={{
                     maxWidth: 'calc(100% - 28px)',
-                    // backgroundColor: '#20202b',
-                    borderBottom: 'solid 2px #97eab4',
+                    background: `-webkit-linear-gradient(180deg, ${florColor[0]}, ${florColor[1]})`,
                 }}
             >
-                <div className='flex flex-row justify-center bg-transparent'>
+                <div className='flex flex-row justify-center bg-black'>
                     {/* hola */}
                     <MediaPlayer
                         colorButton={
                             <button
-                                className='cyberpunk'
                                 onClick={() => {
                                     X.log.debug('🌸', { sopa: 'change color 🌈' })
                                     triggerColorChange()
@@ -129,7 +129,9 @@ function Page(props) {
                             />
                         </audio>
                     </MediaPlayer>
+                    <br />
                 </div>
+                {/* <span >{florColor[0]}</span> */}
             </div>
 
             <Leva
@@ -357,8 +359,6 @@ function Debug({ sound }: { sound: R.MutableRefObject<HTMLAudioElement> }) {
             <span>beats: {dbeats}</span>
             <br />
             <span>particles: {dparticles}</span>
-            {/* <br />
-                                                                                    <span>segments: {dsegments}</span> */}
             <br />
             <span>sections: {dsection}</span>
             <br />
@@ -382,10 +382,10 @@ function Debug({ sound }: { sound: R.MutableRefObject<HTMLAudioElement> }) {
 
 function MediaPlayer({ children, colorButton }) {
     /*
-           * maybe ping mux? as showcase?
-          /*
-           * maybe ping r3f? as showcase?
-           */
+               * maybe ping mux? as showcase?
+              /*
+               * maybe ping r3f? as showcase?
+               */
     return (
         <>
             <MediaController
@@ -398,9 +398,9 @@ function MediaPlayer({ children, colorButton }) {
             >
                 {children}
                 {/* <audio
-                              slot='media'
-                              src='https://stream.mux.com/O4h5z00885HEucNNa1rV02wZapcGp01FXXoJd35AHmGX7g/audio.m4a'
-                          /> */}
+                                        slot='media'
+                                        src='https://stream.mux.com/O4h5z00885HEucNNa1rV02wZapcGp01FXXoJd35AHmGX7g/audio.m4a'
+                                    /> */}
                 <MediaControlBar>
                     {/* <MediaLoadingIndicator /> */}
                     {/* @link https://media-chrome-docs.vercel.app/en/keyboard-shortcuts

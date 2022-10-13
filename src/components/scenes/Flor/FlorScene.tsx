@@ -7,7 +7,7 @@ import { createColorsArray } from '@/utils/coloritos'
 import vertexShader from './flor.vertex.glsl'
 import { fragmentShader } from './flor.frag'
 import { createAttributes } from './flor.attr'
-import { useTriggerChangeColor } from '@/helpers/store'
+import { useGlobalColors, useTriggerChangeColor } from '@/helpers/store'
 import { useSceneMotions } from './flor.effects'
 
 export default function FlorScene({
@@ -96,9 +96,7 @@ export default function FlorScene({
         }
     }, [particles, offset, leverC, leverCrazy, leverD, leverE, leverR, leverR2])
 
-    // const [[, niceColors]] = useColoritos({ quantity: 2 })
-    const [niceColors, setColors] = R.useState(['#bb0000', '#00ff00'])
-
+    const [niceColors, setColors] = useGlobalColors()
     const group = R.useRef<T.Group>(null!)
     // useInterval(() => {
     //     // console.log(niceColors)
@@ -129,7 +127,7 @@ export default function FlorScene({
         leverE,
         leverR,
         leverR2,
-        colorChangeRequested,
+        niceColors,
     ])
 
     useSceneMotions(

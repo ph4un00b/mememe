@@ -1,6 +1,13 @@
 import create from 'zustand'
 import shallow from 'zustand/shallow'
 
+type MyGlobalColors = {
+  changedColorsCounter: number
+  changeColors: () => void
+  coloritos: [string, string]
+  changeColoritos: (val: [string, string]) => void
+}
+
 type MyGlobalState = {
   dom: HTMLDivElement | null
   fps: number
@@ -17,15 +24,14 @@ type MyGlobalState = {
   changeSongPosition: (val: number) => void
   seekedPosition: number
   seekSongPosition: (val: number) => void
-  changedColorsCounter: number
-  changeColors: () => void
+
   isSongPlaying: boolean
   setIsSongPlaying: (val: boolean) => void
   // color2: string;
   // intensiveComputation: string;
   // changecolor1: (value: string) => void;
   // changecolor2: (value: string) => void;
-}
+} & MyGlobalColors
 
 const useStoreImpl = create<MyGlobalState>((set) => {
   return {
@@ -105,6 +111,16 @@ const useStoreImpl = create<MyGlobalState>((set) => {
         }
       })
     },
+    coloritos: ['#bb0000', '#00ff00'],
+    changeColoritos: (value) => {
+      set((prev) => {
+        // console.log(`prev`, prev)
+        return {
+          ...prev,
+          coloritos: [...value],
+        }
+      })
+    },
   }
 })
 
@@ -161,6 +177,13 @@ export function useTriggerChangeColor() {
   // todo: an event could be better?
   const state = useStore((state) => state.changedColorsCounter)
   const setState = useStore((state) => state.changeColors)
+  return [state, setState] as const
+}
+
+export function useGlobalColors() {
+  // todo: an event could be better?
+  const state = useStore((state) => state.coloritos)
+  const setState = useStore((state) => state.changeColoritos)
   return [state, setState] as const
 }
 

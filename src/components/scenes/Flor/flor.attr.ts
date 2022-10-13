@@ -19,7 +19,7 @@ export function createAttributes(
 
     const colorIn = new T.Color(niceColors[0])
     // const colorOut = new T.Color(niceColors[1 + Math.floor(Math.random() * 4)]);
-    const colorOut = new T.Color(niceColors[2])
+    const colorOut = new T.Color(niceColors[1])
 
     for (let i = 0; i < particles; i++) {
         const xyz = i * 3
