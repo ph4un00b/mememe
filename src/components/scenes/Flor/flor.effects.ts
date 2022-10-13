@@ -74,7 +74,6 @@ export function useSceneMotions(
     const currentSection = R.useRef(0)
 
     F.useFrame(({ clock }) => {
-        if (percentComplete >= 100) return
         // camera.position.z = Math.cos(
         //     // despues incrementar a 1
         //     camera.position.z + clock.elapsedTime * +2
@@ -106,32 +105,11 @@ export function useSceneMotions(
         }
 
         if (currentSection.current >= 8 && currentSection.current < 11) {
-            // we can precalculate this below if needed
-            const val =
-                1.5 -
-                mapRange(
-                    currentSection.current,
-                    { iMin: 8, iMax: 11 },
-                    {
-                        oMin: 0.1,
-                        oMax: 1.5,
-                    }
-                )
-
-            camera.position.z = Math.cos(
-                // despues incrementar a 1
-                camera.position.z + clock.elapsedTime * +val
-            )
-            camera.position.y = Math.sin(
-                // 1. incrementar a 1
-                camera.position.x + clock.elapsedTime * +val
-            )
         }
     })
 
     F.useFrame(({ clock }) => {
-        if (percentComplete >= 100) return
-        camera.rotateZ(clock.elapsedTime * 0.1)
+        // camera.rotateZ(clock.elapsedTime * 2.1)
     })
 
     useMotions(
@@ -147,7 +125,7 @@ export function useSceneMotions(
                 Lset({ leverCrazy: 0.5 * 0.45 + Math.random() })
             }
         },
-        function enterCallback({ chunk, current }) {
+        function enterCallback({ chunk, current, state }) {
             if (chunk.confidence >= 0.4) {
                 // changeDebugParticles(newParticles)
                 // Lset({ particles: adjustedParticles.current })
@@ -170,7 +148,64 @@ export function useSceneMotions(
                 }
             }
         },
-        function frameCallback({ chunk, state, current }) { }
+        function frameCallback({ chunk, state, current }) {
+            if (chunk?.confidence < 0.4) {
+                // will stop rotation at the end
+                camera.rotateZ(state.clock.elapsedTime * 1)
+            }
+        }
+    )
+
+    useMotions(
+        { type: 'sections' },
+        function beforeLeaveCallback({ next, current }) { },
+        function enterCallback({ chunk, state, current }) { },
+        function frameCallback({ chunk, state, current, event }) {
+            const [index] = current
+
+            if (
+                (index >= 9 && index < 12 && event == 'entering') ||
+                event == 'leaving'
+            ) {
+                const velocity =
+                    1 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.1, oMax: 1 })
+                camera.rotateZ(state.clock.elapsedTime * velocity)
+            }
+        }
+    )
+    useMotions(
+        { type: 'sections' },
+        function beforeLeaveCallback({ next, current }) { },
+        function enterCallback({ chunk, state, current }) { },
+        function frameCallback({ chunk, state, current, event }) {
+            const [index] = current
+
+            if (
+                (index >= 9 && index < 12 && event == 'entering') ||
+                event == 'leaving'
+            ) {
+                // we can precalculate this below if needed
+                const val =
+                    1.5 -
+                    mapRange(
+                        index,
+                        { iMin: 9, iMax: 11 },
+                        {
+                            oMin: 0.1,
+                            oMax: 1.4,
+                        }
+                    )
+
+                // changeDebugBeats(val)
+                // changeDebugParticles(index)
+                camera.position.z = Math.cos(
+                    camera.position.z + state.clock.elapsedTime * +val
+                )
+                camera.position.y = Math.sin(
+                    camera.position.x + state.clock.elapsedTime * +val
+                )
+            }
+        }
     )
 
     useMotions(
@@ -181,27 +216,7 @@ export function useSceneMotions(
             const [index] = current
 
             if (index >= 0 && index < 8 && event == 'entering') {
-                const velocity = mapRange(
-                    index,
-                    { iMin: 0, iMax: 7 },
-                    {
-                        oMin: 0.1,
-                        oMax: 0.6,
-                    }
-                )
-
                 Lset({ leverD: index + 1 })
-            }
-
-            if (index >= 0 && index < 8 && event == 'leaving') {
-                const velocity = mapRange(
-                    index,
-                    { iMin: 0, iMax: 7 },
-                    {
-                        oMin: 0.1,
-                        oMax: 0.6,
-                    }
-                )
             }
 
             if (index == 8 && event == 'entering') {
@@ -219,16 +234,7 @@ export function useSceneMotions(
              */
             if (index >= 9 && index < 12 && event == 'entering') {
                 group.current.rotation.set(0, 0, 0)
-
-                const velocity =
-                    2 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.1, oMax: 2 })
-
                 Lset({ leverD: index + 5 })
-            }
-
-            if (index > 9 && index <= 12 && event == 'leaving') {
-                const velocity =
-                    2 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.9, oMax: 2 })
             }
         }
     )
