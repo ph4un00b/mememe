@@ -24,10 +24,6 @@ let chunkCounter = 0
 
 const log = (text, extra = []) => {
     return
-    let style = Style.base.join(';') + ';'
-    style += extra.join(';') // Add any additional styles
-    // eslint-disable-next-line no-console
-    console.log(`%c${text}`, style)
 }
 
 type ParamsProps = {

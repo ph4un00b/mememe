@@ -1,17 +1,12 @@
 import dynamic from 'next/dynamic'
 import FlorScene from '@/components/scenes/Flor/FlorScene'
 import * as meta from '@/config'
-import { PerspectiveCamera, useDetectGPU } from '@react-three/drei'
+import { PerspectiveCamera } from '@react-three/drei'
 import * as X from 'next-axiom'
 import { Leva } from 'leva'
 import * as hooks from '@/utils/hooks'
 import * as R from 'react'
 import * as browser from '@/utils/browser'
-import {
-    AudioPlayerControls,
-    useAudioPlayer,
-    useAudioPosition,
-} from 'react-use-audio-player'
 import {
     useDebugBeats,
     useDebugParticles,
@@ -25,34 +20,43 @@ import * as D from '@react-three/drei'
 // const Box = dynamic(() => import('@/components/canvas/Box'), {
 //     ssr: false,
 // })
+
 let baseUrl = 'https://ph4un00b.github.io/data'
 
 function Page(props) {
     const [collapsed, setCollapsed] = R.useState(true)
     const [ended, setEnd] = R.useState(false)
 
-    const { togglePlayPause, ready, loading, playing } = useAudioPlayer({
-        src: `${baseUrl}/florecer/source.mus`,
-        format: 'mp3',
-        autoplay: false,
-        html5: false,
-        onend: () => {
-            setEnd(true)
-            X.log.debug('🌸', { ended: true, sopa: 'termino 🎊💃' })
-        },
-        // onseek: (e) => {
-        //     console.log('cambiar!!')
-
-        // }
-    })
-
     hooks.useTimeout(() => {
-        if (browser.isMobile()) X.log.debug('📲', { sopa: 'mobile' })
+        if (browser.isMobile()) X.log.debug('🌸', { sopa: 'mobile' })
         if (browser.isMobile()) return
         setCollapsed(!true)
     }, 3210)
 
     const [, triggerColorChange] = useTriggerChangeColor()
+    const sound = R.useRef<HTMLAudioElement>(null!)
+    const started = R.useRef(false)
+    const [, setSongPosition] = useSongPosition()
+    useAudioHooks(sound, {
+        onended: () => {
+            setEnd(true)
+            X.log.debug('🌸', { ended: true, sopa: 'termino 🎊💃' })
+        },
+        onpause: () => {
+            started.current = false
+            X.log.debug('🌸', { sopa: 'pause musique 🎼' })
+        },
+        onplay: () => {
+            started.current = true
+            X.log.debug('🌸', { sopa: 'play musique 🎼' })
+        },
+        onchanged: (e) => {
+            // console.log(sound.current.currentTime)
+            // console.log(e.timeStamp)
+            setSongPosition(sound.current.currentTime)
+        },
+    })
+
     return (
         <>
             <div
@@ -62,14 +66,28 @@ function Page(props) {
                     maxWidth: 'calc(100% - 28px)',
                 }}
             >
+                <audio
+                    ref={sound}
+                    loop={false}
+                    id='music'
+                    preload='auto'
+                    style={{ display: 'none' }}
+                >
+                    {/* <source src='music/nat2.mp3' type='audio/mpeg' /> */}
+                    <source src={`${baseUrl}/florecer/source.mus`} type='audio/mpeg' />
+                </audio>
+
                 <button
                     className='cyberpunk'
                     onClick={() => {
-                        X.log.debug('🌸', { sopa: 'toggle musique 🎼' })
-                        togglePlayPause()
+                        if (!started.current) {
+                            sound.current.play()
+                        } else {
+                            sound.current.pause()
+                        }
                     }}
                 >
-                    {!ready && !loading ? 'Loading' : 'Play'}
+                    Nat
                 </button>
 
                 <button
@@ -82,9 +100,10 @@ function Page(props) {
                     Color
                 </button>
 
-                <IfFeatureEnabled feature='florecer-debug'>
-                    <Debug />
-                </IfFeatureEnabled>
+                {/* <IfFeatureEnabled feature='florecer-debug'>
+                                                            <Debug />
+                                                        </IfFeatureEnabled> */}
+                <Debug sound={sound} />
             </div>
 
             <Leva
@@ -113,6 +132,139 @@ Page.r3f = function (props) {
             <LoadFlorecer />
             {/* <axesHelper args={[8]} /> */}
         </>
+    )
+}
+
+function useAudioHooks(
+    sound: R.MutableRefObject<HTMLAudioElement>,
+    {
+        onended,
+        onpause,
+        onplay,
+        onchanged
+    }: {
+        onended: (e) => void
+        onpause: (e) => void
+        onplay: (e) => void
+        onchanged: (e) => void
+    }
+) {
+    /**
+     * @link https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement#events
+     */
+    hooks.useAudioListener(
+        'canplay',
+        (e) => {
+            console.log('canplay', e)
+        },
+        sound
+    )
+
+    hooks.useAudioListener(
+        'play',
+        (e) => {
+            // console.log('play', e)
+            onplay(e)
+        },
+        sound
+    )
+
+    hooks.useAudioListener(
+        'ended',
+        (e) => {
+            // console.log('ended', e)
+            onended(e)
+        },
+        sound
+    )
+
+    hooks.useAudioListener(
+        'durationchange',
+        (e) => {
+            console.log('durationchange', e)
+        },
+        sound
+    )
+
+    hooks.useAudioListener(
+        'emptied',
+        (e) => {
+            console.log('emptied', e)
+        },
+        sound
+    )
+    hooks.useAudioListener(
+        'pause',
+        (e) => {
+            // console.log('pause', e)
+            onpause(e)
+        },
+        sound
+    )
+    hooks.useAudioListener(
+        'playing',
+        (e) => {
+            console.log('playing', e)
+        },
+        sound
+    )
+    hooks.useAudioListener(
+        'error',
+        (e) => {
+            console.log('error', e)
+        },
+        sound
+    )
+    hooks.useAudioListener(
+        'ratechange',
+        (e) => {
+            console.log('ratechange', e)
+        },
+        sound
+    )
+    hooks.useAudioListener(
+        'seeked',
+        (e) => {
+            console.log('seeked', e)
+        },
+        sound
+    )
+    hooks.useAudioListener(
+        'seeking',
+        (e) => {
+            console.log('seeking', e)
+        },
+        sound
+    )
+    hooks.useAudioListener(
+        'suspend',
+        (e) => {
+            console.log('suspend', e)
+        },
+        sound
+    )
+    hooks.useAudioListener(
+        'timeupdate',
+        (e) => {
+            // updates alot!
+            onchanged(e)
+            // console.log('timeupdate', e)
+        },
+        sound
+    )
+    hooks.useAudioListener(
+        'volumechange',
+        (e) => {
+            // updates alot!
+        },
+        sound
+    )
+    hooks.useAudioListener(
+        'waiting',
+        (e) => {
+            // updates alot!
+        },
+        sound
     )
 }
 
@@ -164,11 +316,9 @@ function LoadFlorecer() {
     }
 }
 
-function Debug() {
-    const [, changePosition] = useSongPosition()
-    const { percentComplete, duration, seek } = useAudioPosition({
-        highRefreshRate: true,
-    })
+function Debug({ sound }: { sound: R.MutableRefObject<HTMLAudioElement> }) {
+    // const [, changePosition] = useSongPosition()
+    const [, seekPosition] = useSeekPosition()
 
     const [dbeats] = useDebugBeats()
     const [dparticles] = useDebugParticles()
@@ -182,7 +332,7 @@ function Debug() {
             <br />
             <span>particles: {dparticles}</span>
             {/* <br />
-                            <span>segments: {dsegments}</span> */}
+                                                            <span>segments: {dsegments}</span> */}
             <br />
             <span>sections: {dsection}</span>
             <br />
@@ -190,13 +340,13 @@ function Debug() {
                 return (
                     <button
                         onClick={() => {
-                            seek(section.start)
                             changePosition(section.start)
+                            sound.current.currentTime = section.start
                         }}
                         className='cyberpunk'
                         key={idx}
                     >
-                        {idx} - {section.confidence}
+                        {idx} - {section.start.toFixed(2)}
                     </button>
                 )
             })}

@@ -15,8 +15,12 @@ type MyGlobalState = {
   changeParticles: (val: number) => void
   songPosition: number
   changeSongPosition: (val: number) => void
+  seekedPosition: number
+  seekSongPosition: (val: number) => void
   changedColorsCounter: number
   changeColors: () => void
+  isSongPlaying: boolean
+  setIsSongPlaying: (val: boolean) => void
   // color2: string;
   // intensiveComputation: string;
   // changecolor1: (value: string) => void;
@@ -71,6 +75,26 @@ const useStoreImpl = create<MyGlobalState>((set) => {
         }
       })
     },
+    seekedPosition: 0,
+    seekSongPosition: (val) => {
+      set((prev) => {
+        // console.log(`prev`, prev)
+        return {
+          ...prev,
+          seekedPosition: val,
+        }
+      })
+    },
+    isSongPlaying: false,
+    setIsSongPlaying: (val: boolean) => {
+      set((prev) => {
+        // console.log(`prev`, prev)
+        return {
+          ...prev,
+          isSongPlaying: val,
+        }
+      })
+    },
     changedColorsCounter: 0,
     changeColors: () => {
       set((prev) => {
@@ -118,6 +142,12 @@ export function useDebugSections() {
 export function useSongPosition() {
   const state = useStore((state) => state.songPosition)
   const setState = useStore((state) => state.changeSongPosition)
+  return [state, setState] as const
+}
+
+export function useAudioStatus() {
+  const state = useStore((state) => state.isSongPlaying)
+  const setState = useStore((state) => state.setIsSongPlaying)
   return [state, setState] as const
 }
 
