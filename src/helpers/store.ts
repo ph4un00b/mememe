@@ -2,7 +2,6 @@ import create from 'zustand'
 import shallow from 'zustand/shallow'
 import * as R from 'react'
 import { baseUrl } from '@/utils/external'
-import * as portals from 'react-reverse-portal'
 
 type MyGlobalColors = {
   changedColorsCounter: number
