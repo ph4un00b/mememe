@@ -103,6 +103,15 @@ function MediaPlayer() {
                     {/* <MediaFullscreenButton /> */}
                 </MediaControlBar>
             </MediaController>
+
+            <button
+                className='pr-2'
+                onClick={() => {
+                    X.log.debug('🌸', { sopa: 'full screen! 💻' })
+                }}
+            >
+                full screen
+            </button>
         </>
     )
 }

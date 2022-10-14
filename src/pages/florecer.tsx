@@ -100,13 +100,13 @@ function ColorPortalIn({ portalOut }) {
     const jsx = (
         <>
             <button
-                className='pr-2 text-xs'
+                className='pr-2'
                 onClick={() => {
                     X.log.debug('🌸', { sopa: 'change color 🌈' })
                     triggerColorChange()
                 }}
             >
-                Change Color
+                change color
             </button>
         </>
     )
