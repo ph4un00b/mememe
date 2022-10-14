@@ -27,7 +27,10 @@ const styles = [Style.base, Style.warning, Style.success]
 let chunkCounter = 0
 
 const log = (text, extra = []) => {
-    return
+    let style = Style.base.join(';') + ';'
+    style += extra.join(';') // Add any additional styles
+    // eslint-disable-next-line no-console
+    console.log(`%c${text}`, style)
 }
 
 type ParamsProps = {
@@ -42,7 +45,7 @@ export function useMotions(
     { type }: { type: 'beats' | 'sections' },
     beforeLeaveCallback: (params: ParamsProps) => void,
     enterCallback: (params: ParamsProps) => void,
-    frameCallback: (params: ParamsProps) => void
+    onUpdateCallback: (params: ParamsProps) => void
 ) {
     // let data = R.useRef<MusicAnalysis>(window.structuredClone(florecerData))
     let analysis = R.useMemo(() => {
@@ -79,7 +82,7 @@ export function useMotions(
         }
         let [, cChunk] = currentChunk.current
         if (!cChunk /** was last chunk */) {
-            frameCallback({
+            onUpdateCallback({
                 chunk: cChunk,
                 state,
                 current: currentChunk.current,
@@ -116,7 +119,7 @@ export function useMotions(
             }
         }
 
-        frameCallback({
+        onUpdateCallback({
             chunk: cChunk,
             state,
             current: currentChunk.current,

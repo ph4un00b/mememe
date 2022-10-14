@@ -3,16 +3,16 @@ import * as R from 'react'
 import * as D from '@react-three/drei'
 import * as F from '@react-three/fiber'
 import dynamic from 'next/dynamic'
-import FlorScene from '@/components/scenes/Flor/FlorScene'
 import * as meta from '@/config'
 import { PerspectiveCamera } from '@react-three/drei'
 import { Leva } from 'leva'
 import { FlorTop } from '@/components/dom/Instructions'
 import * as browser from '@/utils/browser'
+import FlorNoMotions from '@/components/scenes/Flor/FlorNoMotions'
 
-const Box = dynamic(() => import('@/components/canvas/Box'), {
-    ssr: false,
-})
+// const Box = dynamic(() => import('@/components/canvas/Box'), {
+//     ssr: false,
+// })
 
 // Step 5 - delete Instructions components
 const Page = (props) => {
@@ -72,7 +72,7 @@ function LoadFlorecer() {
 
     if (browser.isIpod() || tier == 2) {
         return (
-            <FlorScene
+            <FlorNoMotions
                 tier={'mid'}
                 maxParticles={15_000}
                 smallParticles={10_000}
@@ -82,7 +82,7 @@ function LoadFlorecer() {
         )
     } else if (tier == 3) {
         return (
-            <FlorScene
+            <FlorNoMotions
                 tier={'high'}
                 maxParticles={70_000}
                 smallParticles={70_000}
@@ -92,7 +92,7 @@ function LoadFlorecer() {
         )
     } else if (tier < 2) {
         return (
-            <FlorScene
+            <FlorNoMotions
                 tier={'low'}
                 maxParticles={2_500}
                 smallParticles={2_000}
