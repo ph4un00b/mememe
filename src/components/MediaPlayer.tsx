@@ -97,7 +97,7 @@ function MediaPlayer() {
                                                   src='https://stream.mux.com/O4h5z00885HEucNNa1rV02wZapcGp01FXXoJd35AHmGX7g/audio.m4a'
                                               /> */}
                 <MediaControlBar>
-                    <MediaLoadingIndicator />
+                    {/* <MediaLoadingIndicator /> */}
                     {/* @link https://media-chrome-docs.vercel.app/en/keyboard-shortcuts
            * preventing seek
            */}
