@@ -83,7 +83,7 @@ export function useSceneMotions(
         //     camera.position.x + clock.elapsedTime * -2
         // )
         // [0, 8] [8, 11] -> [1,9] [9, 12] -> [0.1, 2] [2, 0.1]
-        if (currentSection.current >= 0 && currentSection.current < 8) {
+        if (currentSection.current >= 2 && currentSection.current < 8) {
             // we can precalculate this below if needed
             const val = mapRange(
                 currentSection.current,
@@ -103,13 +103,6 @@ export function useSceneMotions(
                 camera.position.x + clock.elapsedTime * -val
             )
         }
-
-        if (currentSection.current >= 8 && currentSection.current < 11) {
-        }
-    })
-
-    F.useFrame(({ clock }) => {
-        // camera.rotateZ(clock.elapsedTime * 2.1)
     })
 
     useMotions(
@@ -165,7 +158,7 @@ export function useSceneMotions(
 
             if (
                 (index >= 9 && index < 12 && event == 'entering') ||
-                event == 'leaving'
+                (index >= 9 && index < 12 && event == 'leaving')
             ) {
                 const velocity =
                     1 - mapRange(index, { iMin: 9, iMax: 12 }, { oMin: 0.1, oMax: 1 })
@@ -182,7 +175,7 @@ export function useSceneMotions(
 
             if (
                 (index >= 9 && index < 12 && event == 'entering') ||
-                event == 'leaving'
+                (index >= 9 && index < 12 && event == 'leaving')
             ) {
                 // we can precalculate this below if needed
                 const val =
@@ -196,6 +189,38 @@ export function useSceneMotions(
                         }
                     )
 
+                // console.log('entering?')
+                // changeDebugBeats(val)
+                // changeDebugParticles(index)
+                camera.position.z = Math.cos(
+                    camera.position.z + state.clock.elapsedTime * +val
+                )
+                camera.position.y = Math.sin(
+                    camera.position.x + state.clock.elapsedTime * +val
+                )
+            }
+        }
+    )
+
+    useMotions(
+        { type: 'sections' },
+        function beforeLeaveCallback({ next, current, state, chunk }) { },
+        function enterCallback({ chunk, state, current }) { },
+        function frameCallback({ chunk, state, current, event }) {
+            const [index] = current
+            // console.log(index)
+            if (index >= 1 && index < 9 && event == 'leaving') {
+                // we can precalculate this below if needed
+                const val = mapRange(
+                    index,
+                    { iMin: 1, iMax: 8 },
+                    {
+                        oMin: 0.1,
+                        oMax: 1.0,
+                    }
+                )
+
+                // console.log('crzy??', state.clock.elapsedTime * +val)
                 // changeDebugBeats(val)
                 // changeDebugParticles(index)
                 camera.position.z = Math.cos(
