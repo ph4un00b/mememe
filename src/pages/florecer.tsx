@@ -14,6 +14,8 @@ import {
     useDebugParticles,
     useDebugSections,
     useGlobalColors,
+    useMediaPlayer,
+    usePlayerPortals,
     useSeekPosition,
     useSongPosition,
     useTriggerChangeColor,
@@ -21,16 +23,16 @@ import {
 import { IfFeatureEnabled } from '@growthbook/growthbook-react'
 import florecerData from '../music/florecer.json'
 import * as D from '@react-three/drei'
+import { baseUrl } from '@/utils/external'
+import ReactDOM from 'react-dom'
 
 // const Box = dynamic(() => import('@/components/canvas/Box'), {
 //     ssr: false,
 // })
 
-let baseUrl = 'https://ph4un00b.github.io/data'
-
+const isSSR = typeof window === 'undefined'
 function Page(props) {
     const [collapsed, setCollapsed] = R.useState(true)
-    const [ended, setEnd] = R.useState(false)
 
     hooks.useTimeout(() => {
         if (browser.isMobile()) X.log.debug('🌸', { sopa: 'mobile' })
@@ -38,38 +40,16 @@ function Page(props) {
         setCollapsed(!true)
     }, 3210)
 
-    const [, triggerColorChange] = useTriggerChangeColor()
-    const [florColor] = useGlobalColors()
-    const sound = R.useRef<HTMLAudioElement>(null!)
-    const started = R.useRef(false)
-    const [, setSongPosition] = useSongPosition()
-    const [, setPlaying] = useAudioStatus()
+    const [, changeTrack] = useMediaPlayer()
+    R.useLayoutEffect(() => {
+        changeTrack(`${baseUrl}/florecer/source.mus`)
+    }, [])
 
-    useAudioHooks(sound, {
-        onended: () => {
-            setEnd(true)
-            X.log.debug('🌸', { ended: true, sopa: 'termino 🎊💃' })
-            setPlaying(false)
-        },
-        onpause: () => {
-            started.current = false
-            X.log.debug('🌸', { sopa: 'pause musique 🎼' })
-            setPlaying(false)
-        },
-        onplay: () => {
-            started.current = true
-            X.log.debug('🌸', { sopa: 'play musique 🎼' })
-            setPlaying(true)
-        },
-        onchanged: (e) => {
-            // console.log(sound.current.currentTime)
-            // console.log(e.timeStamp)
-            setSongPosition(sound.current.currentTime)
-        },
-    })
+    const [portalOut] = usePlayerPortals()
 
     return (
         <>
+            <ColorPortalIn portalOut={portalOut} />
             <IfFeatureEnabled feature='florecer-debug'>
                 <div
                     // eslint-disable-next-line tailwind/class-order
@@ -78,46 +58,17 @@ function Page(props) {
                         maxWidth: 'calc(100% - 28px)',
                     }}
                 >
-                    <Debug sound={sound} />
+                    {/* <Debug sound={sound} /> */}
                 </div>
             </IfFeatureEnabled>
-
-            <div
-                // eslint-disable-next-line tailwind/class-order
-                className='absolute px-0 pb-[1px] text-sm transform -translate-x-1/2 shadow-xl select-none bottom-2 md:text-base left-1/2 text-gray-50'
-                style={{
-                    maxWidth: 'calc(100% - 28px)',
-                    background: `-webkit-linear-gradient(180deg, ${florColor[0]}, ${florColor[1]})`,
-                }}
-            >
-                <div className='flex flex-row justify-center bg-black'>
-                    {/* hola */}
-                    <props.rolas>
-                        <audio
-                            slot='media'
-                            ref={sound}
-                            loop={false}
-                            preload='auto'
-                        // style={{ display: 'none' }}
-                        >
-                            {/* <source src='music/nat2.mp3' type='audio/mpeg' /> */}
-                            <source
-                                src={`${baseUrl}/florecer/source.mus`}
-                                type='audio/mpeg'
-                            />
-                        </audio>
-                    </props.rolas>
-                    <br />
-                </div>
-                {/* <span >{florColor[0]}</span> */}
-            </div>
 
             <Leva
                 // collapsed={{
                 //     collapsed: false,
                 //     onChange(c) { },
                 // }}
-                hidden={!ended}
+                // todo: gloabl ended track
+                hidden={!false}
             />
         </>
     )
@@ -141,137 +92,24 @@ Page.r3f = function (props) {
     )
 }
 
-function useAudioHooks(
-    sound: R.MutableRefObject<HTMLAudioElement>,
-    {
-        onended,
-        onpause,
-        onplay,
-        onchanged,
-    }: {
-        onended: (e) => void
-        onpause: (e) => void
-        onplay: (e) => void
-        onchanged: (e) => void
-    }
-) {
-    /**
-     * @link https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement#events
-     */
-    hooks.useAudioListener(
-        'canplay',
-        (e) => {
-            console.log('canplay', e)
-        },
-        sound
-    )
+function ColorPortalIn({ portalOut }) {
+    const [, triggerColorChange] = useTriggerChangeColor()
 
-    hooks.useAudioListener(
-        'play',
-        (e) => {
-            // console.log('play', e)
-            onplay(e)
-        },
-        sound
+    const jsx = (
+        <>
+            <button
+                onClick={() => {
+                    X.log.debug('🌸', { sopa: 'change color 🌈' })
+                    triggerColorChange()
+                }}
+            >
+                Color
+            </button>
+        </>
     )
+    if (!portalOut) return <></>
 
-    hooks.useAudioListener(
-        'ended',
-        (e) => {
-            // console.log('ended', e)
-            onended(e)
-        },
-        sound
-    )
-
-    hooks.useAudioListener(
-        'durationchange',
-        (e) => {
-            console.log('durationchange', e)
-        },
-        sound
-    )
-
-    hooks.useAudioListener(
-        'emptied',
-        (e) => {
-            console.log('emptied', e)
-        },
-        sound
-    )
-    hooks.useAudioListener(
-        'pause',
-        (e) => {
-            // console.log('pause', e)
-            onpause(e)
-        },
-        sound
-    )
-    hooks.useAudioListener(
-        'playing',
-        (e) => {
-            console.log('playing', e)
-        },
-        sound
-    )
-    hooks.useAudioListener(
-        'error',
-        (e) => {
-            console.log('error', e)
-        },
-        sound
-    )
-    hooks.useAudioListener(
-        'ratechange',
-        (e) => {
-            console.log('ratechange', e)
-        },
-        sound
-    )
-    hooks.useAudioListener(
-        'seeked',
-        (e) => {
-            console.log('seeked', e)
-        },
-        sound
-    )
-    hooks.useAudioListener(
-        'seeking',
-        (e) => {
-            console.log('seeking', e)
-        },
-        sound
-    )
-    hooks.useAudioListener(
-        'suspend',
-        (e) => {
-            console.log('suspend', e)
-        },
-        sound
-    )
-    hooks.useAudioListener(
-        'timeupdate',
-        (e) => {
-            // updates alot!
-            onchanged(e)
-            // console.log('timeupdate', e)
-        },
-        sound
-    )
-    hooks.useAudioListener(
-        'volumechange',
-        (e) => {
-            // updates alot!
-        },
-        sound
-    )
-    hooks.useAudioListener(
-        'waiting',
-        (e) => {
-            // updates alot!
-        },
-        sound
-    )
+    return ReactDOM.createPortal(jsx, portalOut)
 }
 
 function LoadFlorecer() {
@@ -357,8 +195,6 @@ function Debug({ sound }: { sound: R.MutableRefObject<HTMLAudioElement> }) {
         </>
     )
 }
-
-
 
 export default Page
 

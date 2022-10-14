@@ -1,11 +1,29 @@
 import create from 'zustand'
 import shallow from 'zustand/shallow'
+import * as R from 'react'
+import { baseUrl } from '@/utils/external'
+import * as portals from 'react-reverse-portal'
 
 type MyGlobalColors = {
   changedColorsCounter: number
   changeColors: () => void
   coloritos: [string, string]
   changeColoritos: (val: [string, string]) => void
+}
+
+type MyGlobalMusic = {
+  songPosition: number
+  changeSongPosition: (val: number) => void
+  seekedPosition: number
+  seekSongPosition: (val: number) => void
+  isSongPlaying: boolean
+  setIsSongPlaying: (val: boolean) => void
+  currentTrack: string
+  changeTrack: (path: string) => void
+  triggerElement1: R.ReactNode
+  setTrigger1Element1: (
+    portalNode: R.ReactNode
+  ) => void
 }
 
 type MyGlobalState = {
@@ -20,18 +38,12 @@ type MyGlobalState = {
   changeSections: (val: number) => void
   debugParticles: number
   changeParticles: (val: number) => void
-  songPosition: number
-  changeSongPosition: (val: number) => void
-  seekedPosition: number
-  seekSongPosition: (val: number) => void
-
-  isSongPlaying: boolean
-  setIsSongPlaying: (val: boolean) => void
   // color2: string;
   // intensiveComputation: string;
   // changecolor1: (value: string) => void;
   // changecolor2: (value: string) => void;
-} & MyGlobalColors
+} & MyGlobalColors &
+  MyGlobalMusic
 
 const useStoreImpl = create<MyGlobalState>((set) => {
   return {
@@ -121,6 +133,24 @@ const useStoreImpl = create<MyGlobalState>((set) => {
         }
       })
     },
+    currentTrack: `${baseUrl}/casa/source.mus`,
+    changeTrack: (path) => {
+      set((prev) => {
+        return {
+          ...prev,
+          currentTrack: path,
+        }
+      })
+    },
+    triggerElement1: null,
+    setTrigger1Element1: (portalNode) => {
+      set((prev) => {
+        return {
+          ...prev,
+          triggerElement1: portalNode,
+        }
+      })
+    },
   }
 })
 
@@ -181,9 +211,20 @@ export function useTriggerChangeColor() {
 }
 
 export function useGlobalColors() {
-  // todo: an event could be better?
   const state = useStore((state) => state.coloritos)
   const setState = useStore((state) => state.changeColoritos)
+  return [state, setState] as const
+}
+
+export function useMediaPlayer() {
+  const state = useStore((state) => state.currentTrack)
+  const setState = useStore((state) => state.changeTrack)
+  return [state, setState] as const
+}
+
+export function usePlayerPortals() {
+  const state = useStore((state) => state.triggerElement1)
+  const setState = useStore((state) => state.setTrigger1Element1)
   return [state, setState] as const
 }
 

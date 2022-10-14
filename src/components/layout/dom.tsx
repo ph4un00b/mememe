@@ -1,12 +1,27 @@
-import { setState } from '@/helpers/store'
-import { useEffect, useRef } from 'react'
+import {
+  setState,
+  useGlobalColors,
+  usePlayerPortals,
+} from '@/helpers/store'
+
+import * as R from 'react'
+import { MediaPlayerMemo } from '../MediaPlayer'
 
 const Dom = ({ children }) => {
-  const ref = useRef<HTMLDivElement | null>(null)
-  useEffect(() => {
+  const ref = R.useRef<HTMLDivElement | null>(null)
+  R.useEffect(() => {
     /** @ts-ignore todo: why?? */
     setState({ dom: ref })
   }, [])
+
+  const [, setPortalOut] = usePlayerPortals()
+  const portalOut = R.useRef(null!)
+
+  R.useEffect(() => {
+    setPortalOut(portalOut.current)
+  }, [])
+
+  const [colors] = useGlobalColors()
 
   return (
     <div
@@ -14,6 +29,20 @@ const Dom = ({ children }) => {
       ref={ref}
     >
       {children}
+
+      <div
+        // eslint-disable-next-line tailwind/class-order
+        className='absolute px-0 pb-[2px] text-sm transform -translate-x-1/2 shadow-xl select-none bottom-2 md:text-base left-1/2 text-gray-50'
+        style={{
+          maxWidth: 'calc(100% - 28px)',
+          background: `-webkit-linear-gradient(180deg, ${colors[0]}, ${colors[1]})`,
+        }}
+      >
+        <div ref={portalOut} className='flex flex-row justify-center bg-black'>
+          <MediaPlayerMemo />
+        </div>
+        {/* <span >{florColor[0]}</span> */}
+      </div>
     </div>
   )
 }
