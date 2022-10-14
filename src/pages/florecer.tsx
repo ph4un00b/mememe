@@ -21,18 +21,7 @@ import {
 import { IfFeatureEnabled } from '@growthbook/growthbook-react'
 import florecerData from '../music/florecer.json'
 import * as D from '@react-three/drei'
-import {
-    MediaControlBar,
-    MediaController,
-    MediaFullscreenButton,
-    MediaLoadingIndicator,
-    MediaMuteButton,
-    MediaPlaybackRateButton,
-    MediaPlayButton,
-    MediaTimeDisplay,
-    MediaTimeRange,
-    MediaVolumeRange,
-} from 'media-chrome/dist/react'
+
 // const Box = dynamic(() => import('@/components/canvas/Box'), {
 //     ssr: false,
 // })
@@ -103,18 +92,7 @@ function Page(props) {
             >
                 <div className='flex flex-row justify-center bg-black'>
                     {/* hola */}
-                    <MediaPlayer
-                        colorButton={
-                            <button
-                                onClick={() => {
-                                    X.log.debug('🌸', { sopa: 'change color 🌈' })
-                                    triggerColorChange()
-                                }}
-                            >
-                                Color
-                            </button>
-                        }
-                    >
+                    <props.rolas>
                         <audio
                             slot='media'
                             ref={sound}
@@ -128,7 +106,7 @@ function Page(props) {
                                 type='audio/mpeg'
                             />
                         </audio>
-                    </MediaPlayer>
+                    </props.rolas>
                     <br />
                 </div>
                 {/* <span >{florColor[0]}</span> */}
@@ -380,50 +358,7 @@ function Debug({ sound }: { sound: R.MutableRefObject<HTMLAudioElement> }) {
     )
 }
 
-function MediaPlayer({ children, colorButton }) {
-    /*
-               * maybe ping mux? as showcase?
-              /*
-               * maybe ping r3f? as showcase?
-               */
-    return (
-        <>
-            <MediaController
-                MediaController
-                audio
-                // @link https://media-chrome-docs.vercel.app/en/styling
-                style={{
-                    '--media-control-background': 'rgba(0,0,0,0.5)',
-                }}
-            >
-                {children}
-                {/* <audio
-                                        slot='media'
-                                        src='https://stream.mux.com/O4h5z00885HEucNNa1rV02wZapcGp01FXXoJd35AHmGX7g/audio.m4a'
-                                    /> */}
-                <MediaControlBar>
-                    {/* <MediaLoadingIndicator /> */}
-                    {/* @link https://media-chrome-docs.vercel.app/en/keyboard-shortcuts
-           * preventing seek
-           */}
-                    <MediaPlayButton keysused={'Space'} />
-                    <MediaTimeDisplay show-duration={false} />
-                    {/* <MediaTimeRange /> */}
-                    {/* <MediaPlaybackRateButton /> */}
-                    <MediaMuteButton />
-                    <MediaVolumeRange />
-                    {/*
-           * media-only <MediaFullscreenButton />
-           * //todo: we should offer a fullscren option for the whole visual
-           */}
-                    {/* <MediaFullscreenButton /> */}
-                </MediaControlBar>
-            </MediaController>
 
-            {colorButton}
-        </>
-    )
-}
 
 export default Page
 
