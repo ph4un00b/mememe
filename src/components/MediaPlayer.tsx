@@ -101,6 +101,7 @@ function MediaPlayer() {
                     {/* @link https://media-chrome-docs.vercel.app/en/keyboard-shortcuts
            * preventing seek
            */}
+                    {/* //todo: we might want a loading status in the play button */}
                     <MediaPlayButton keysused={'Space'} />
                     <MediaTimeDisplay show-duration={false} />
                     {/* <MediaTimeRange /> */}
