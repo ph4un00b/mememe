@@ -41,6 +41,7 @@ function Page(props) {
     }, 3210)
 
     const [, changeTrack] = useMediaPlayer()
+
     R.useLayoutEffect(() => {
         changeTrack(`${baseUrl}/florecer/source.mus`)
     }, [])
@@ -97,13 +98,13 @@ function ColorPortalIn({ portalOut }) {
 
     const jsx = (
         <>
-            <button
+            <button className='pr-2 text-xs'
                 onClick={() => {
                     X.log.debug('🌸', { sopa: 'change color 🌈' })
                     triggerColorChange()
                 }}
             >
-                Color
+                Change Color
             </button>
         </>
     )
