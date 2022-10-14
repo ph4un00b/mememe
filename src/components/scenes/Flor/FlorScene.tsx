@@ -2,6 +2,7 @@ import * as R from 'react'
 import * as T from 'three'
 import * as L from 'leva'
 import * as F from '@react-three/fiber'
+import * as X from 'next-axiom'
 import { createColorsArray } from '@/utils/coloritos'
 // @ts-ignore
 import vertexShader from './flor.vertex.glsl'
@@ -25,6 +26,12 @@ export default function FlorScene({
 }) {
     const geometry = R.useRef<T.BufferGeometry>(null!)
     const points = R.useRef<T.Points>(null!)
+
+    R.useEffect(() => {
+        X.log.debug('🌸', {
+            tier,
+        })
+    }, [])
 
     const [
         {

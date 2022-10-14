@@ -1,14 +1,14 @@
-
+import * as X from 'next-axiom'
+import * as R from 'react'
+import * as D from '@react-three/drei'
+import * as F from '@react-three/fiber'
 import dynamic from 'next/dynamic'
 import FlorScene from '@/components/scenes/Flor/FlorScene'
 import * as meta from '@/config'
 import { PerspectiveCamera } from '@react-three/drei'
-import * as X from 'next-axiom'
 import { Leva } from 'leva'
 import { FlorTop } from '@/components/dom/Instructions'
-import * as R from 'react'
 import * as browser from '@/utils/browser'
-import * as D from '@react-three/drei'
 
 const Box = dynamic(() => import('@/components/canvas/Box'), {
     ssr: false,
@@ -27,7 +27,7 @@ const Page = (props) => {
 
 Page.r3f = (props) => (
     <>
-        <color attach="background" args={['#000']} />
+        <color attach='background' args={['#000']} />
         <PerspectiveCamera
             position={[0, 0, 1]}
             fov={75}
@@ -51,9 +51,12 @@ export async function getStaticProps() {
     }
 }
 
-
 function LoadFlorecer() {
-    const { device, fps, gpu, isMobile, tier, type } = D.useDetectGPU()
+    const { gl } = F.useThree()
+    const { device, fps, gpu, isMobile, tier, type } = D.useDetectGPU({
+        benchmarksURL: './data',
+        glContext: gl.getContext(),
+    })
 
     R.useEffect(() => {
         X.log.debug('🌸', {

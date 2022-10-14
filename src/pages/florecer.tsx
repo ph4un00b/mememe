@@ -1,12 +1,14 @@
 /* eslint-disable no-console */
+import * as D from '@react-three/drei'
+import * as F from '@react-three/fiber'
+import * as R from 'react'
+import * as X from 'next-axiom'
 import dynamic from 'next/dynamic'
 import FlorScene from '@/components/scenes/Flor/FlorScene'
 import * as meta from '@/config'
 import { PerspectiveCamera } from '@react-three/drei'
-import * as X from 'next-axiom'
 import { Leva } from 'leva'
 import * as hooks from '@/utils/hooks'
-import * as R from 'react'
 import * as browser from '@/utils/browser'
 import {
     useAudioStatus,
@@ -22,7 +24,6 @@ import {
 } from '@/helpers/store'
 import { IfFeatureEnabled } from '@growthbook/growthbook-react'
 import florecerData from '../music/florecer.json'
-import * as D from '@react-three/drei'
 import { baseUrl } from '@/utils/external'
 import ReactDOM from 'react-dom'
 
@@ -98,7 +99,8 @@ function ColorPortalIn({ portalOut }) {
 
     const jsx = (
         <>
-            <button className='pr-2 text-xs'
+            <button
+                className='pr-2 text-xs'
                 onClick={() => {
                     X.log.debug('🌸', { sopa: 'change color 🌈' })
                     triggerColorChange()
@@ -114,7 +116,11 @@ function ColorPortalIn({ portalOut }) {
 }
 
 function LoadFlorecer() {
-    const { device, fps, gpu, isMobile, tier, type } = D.useDetectGPU()
+    const { gl } = F.useThree()
+    const { device, fps, gpu, isMobile, tier, type } = D.useDetectGPU({
+        benchmarksURL: './data',
+        glContext: gl.getContext(),
+    })
 
     R.useEffect(() => {
         X.log.debug('🌸', {
