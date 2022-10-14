@@ -50,8 +50,8 @@ export function useMotions(
             return window.structuredClone(florecerData) as MusicAnalysis
         }
         /** mostly ios fallback */
-        X.log.debug('🌸', {
-            sopa: '📛⛑ falling from structuredClone',
+        X.log.error('🌸', {
+            sopa: '📛falling from structuredClone',
             agent: window.navigator.userAgent,
         })
         return clone(florecerData) as MusicAnalysis

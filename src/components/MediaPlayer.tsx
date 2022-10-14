@@ -24,21 +24,33 @@ function MediaPlayer() {
                   /*
                    * maybe ping r3f? as showcase?
                    */
-
-
     const [currentTrack] = useMediaPlayer()
-
-    R.useLayoutEffect(() => {
-        sound.current.src = currentTrack
-    }, [currentTrack])
-
     const started = R.useRef(false)
     const [, setSongPosition] = useSongPosition()
     const [, setPlaying] = useAudioStatus()
     const [ended, setEnd] = R.useState(false)
     const sound = R.useRef<HTMLAudioElement>(null!)
 
+    R.useEffect(() => {
+        X.log.debug(' 🎼', { sopa: 'changed track', track: currentTrack })
+        if (sound.current) {
+            sound.current.pause();
+            sound.current.load();
+            // this line below might not work on mobile devices
+            // do not use!
+            // sound.current.play();
+        }
+    }, [currentTrack])
+
     useAudioHooks(sound, {
+        onerror: (e) => {
+            X.log.error('🌸', {
+                sopa: '📛 something went wrong',
+                track: currentTrack,
+                agent: window.navigator.userAgent,
+                e
+            })
+        },
         onended: () => {
             setEnd(true)
             // todo: create a hash mapping routes with an emoji
@@ -73,12 +85,11 @@ function MediaPlayer() {
                 }}
             >
                 <audio slot='media' ref={sound} loop={false} preload='auto'>
-                    {/* <source src='music/nat2.mp3' type='audio/mpeg' /> */}
-                    {/* <source
+                    <source
                         // todo: this might be extra stuff, since we use a audio ref
                         src={currentTrack}
                         type='audio/mpeg'
-                    /> */}
+                    />
                 </audio>
                 {/* {children} */}
                 {/* <audio
@@ -86,7 +97,7 @@ function MediaPlayer() {
                                                   src='https://stream.mux.com/O4h5z00885HEucNNa1rV02wZapcGp01FXXoJd35AHmGX7g/audio.m4a'
                                               /> */}
                 <MediaControlBar>
-                    {/* <MediaLoadingIndicator /> */}
+                    <MediaLoadingIndicator />
                     {/* @link https://media-chrome-docs.vercel.app/en/keyboard-shortcuts
            * preventing seek
            */}
@@ -119,11 +130,13 @@ function MediaPlayer() {
 function useAudioHooks(
     sound: R.MutableRefObject<HTMLAudioElement>,
     {
+        onerror,
         onended,
         onpause,
         onplay,
         onchanged,
     }: {
+        onerror: (e) => void
         onended: (e) => void
         onpause: (e) => void
         onplay: (e) => void
@@ -192,7 +205,8 @@ function useAudioHooks(
     hooks.useAudioListener(
         'error',
         (e) => {
-            console.log('error', e)
+            // console.log('error', e)
+            onerror(e)
         },
         sound
     )
