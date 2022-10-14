@@ -118,8 +118,8 @@ function ColorPortalIn({ portalOut }) {
 function LoadFlorecer() {
     const { gl } = F.useThree()
     const { device, fps, gpu, isMobile, tier, type } = D.useDetectGPU({
-        benchmarksURL: './data',
-        // glContext: gl.getContext(),
+        benchmarksURL: './benchmarks',
+        glContext: gl.getContext(),
     })
 
     R.useEffect(() => {
