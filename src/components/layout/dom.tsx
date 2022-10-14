@@ -32,7 +32,7 @@ const Dom = ({ children }) => {
 
       <div
         // eslint-disable-next-line tailwind/class-order
-        className='absolute px-0 pb-[2px] text-sm transform -translate-x-1/2 shadow-xl select-none bottom-2 md:text-base left-1/2 text-gray-50'
+        className='absolute px-0 pb-[1.5px] text-sm transform -translate-x-1/2 shadow-xl select-none bottom-2 md:text-base left-1/2 text-gray-50'
         style={{
           maxWidth: 'calc(100% - 28px)',
           background: `-webkit-linear-gradient(180deg, ${colors[0]}, ${colors[1]})`,
