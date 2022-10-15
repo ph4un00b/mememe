@@ -24,8 +24,6 @@ const Style = {
 }
 
 const styles = [Style.base, Style.warning, Style.success]
-let chunkCounter = 0
-
 const log = (text, extra = []) => {
     let style = Style.base.join(';') + ';'
     style += extra.join(';') // Add any additional styles
@@ -64,12 +62,12 @@ export function useMotions(
     const [seekedPosition] = useSeekPosition()
     const [songPlaying] = useAudioStatus()
     const [songPosition] = useSongPosition()
-    const [trackChanged] = useMediaPlayer()
+    const [globalTrackChanged] = useMediaPlayer()
     const cChunk = R.useRef<[number, Beat | Section]>([0, analysis[type][0]])
 
     const prevTime = R.useRef(0)
     const prevPosition = R.useRef(0)
-    const pos = R.useRef(0)
+    const position = R.useRef(0)
 
     /**
      * simplest solution in my mind at the moment
@@ -84,7 +82,7 @@ export function useMotions(
         if (!(songPosition > 0) || !songPlaying) return
         if (prevPosition.current == songPosition) {
             const delta = state.clock.elapsedTime - prevTime.current
-            pos.current += delta
+            position.current += delta
         }
         prevPosition.current = songPosition
         // todo: research if i can get a better delta
@@ -93,7 +91,7 @@ export function useMotions(
 
     R.useEffect(() => {
         const index = getChunkIdx({
-            songPosition: pos.current,
+            songPosition: position.current,
             type,
         })
         cChunk.current = [index, analysis[type][index]]
@@ -106,14 +104,14 @@ export function useMotions(
     R.useLayoutEffect(() => {
         if (songPosition > 0) return
         cChunk.current = [0, analysis[type][0]]
-    }, [trackChanged])
+    }, [globalTrackChanged])
 
     F.useFrame((state) => {
         // if (type != 'beats') return
         // console.log({ curr: currentChunk.current })
         // console.log({ songPosition })
         // console.log({ motion: inMotion.current })
-        if (!(pos.current > 0) || !songPlaying) {
+        if (!(position.current > 0) || !songPlaying) {
             return
         }
 
@@ -132,16 +130,16 @@ export function useMotions(
         let slice = chunk.duration / 5 /** can be whatever */
 
         if (!inMotion.current) {
-            if (pos.current > chunk.start && pos.current < chunkEnd) {
+            if (position.current > chunk.start && position.current < chunkEnd) {
                 inMotion.current = true
                 logChunk(type, cChunk)
                 enterCallback({ chunk: chunk, state, current: cChunk.current })
             }
         } else {
             const threshold = chunkEnd - 2 * slice
-            if (pos.current > threshold) {
+            if (position.current > threshold) {
                 const idx = getChunkIdx({
-                    songPosition: pos.current,
+                    songPosition: position.current,
                     type,
                 })
                 cChunk.current = [idx + 1, analysis[type][idx + 1]]
