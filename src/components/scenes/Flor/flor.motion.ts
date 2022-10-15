@@ -65,16 +65,16 @@ export function useMotions(
     const [songPlaying] = useAudioStatus()
     const [songPosition] = useSongPosition()
     const [trackChanged] = useMediaPlayer()
-    let currentChunk = R.useRef<[number, Beat | Section]>([0, analysis[type][0]])
+    const cChunk = R.useRef<[number, Beat | Section]>([0, analysis[type][0]])
 
     const prevTime = R.useRef(0)
     const prevPosition = R.useRef(0)
-    const position = R.useRef(0)
+    const pos = R.useRef(0)
 
     /**
      * simplest solution in my mind at the moment
      * to have high rate timing for animations,
-     * i might found something better afterwards,
+     * i might find something better afterwards,
      * this seems to be issuing more than needed
      * i might refactor this out of this context
      * in order to run it once
@@ -84,7 +84,7 @@ export function useMotions(
         if (!(songPosition > 0) || !songPlaying) return
         if (prevPosition.current == songPosition) {
             const delta = state.clock.elapsedTime - prevTime.current
-            position.current += delta
+            pos.current += delta
         }
         prevPosition.current = songPosition
         // todo: research if i can get a better delta
@@ -92,11 +92,11 @@ export function useMotions(
     })
 
     R.useEffect(() => {
-        const index = currentChunkIndex({
-            songPosition: position.current,
+        const index = getChunkIdx({
+            songPosition: pos.current,
             type,
         })
-        currentChunk.current = [index, analysis[type][index]]
+        cChunk.current = [index, analysis[type][index]]
         /** the intention is to force enterCallback
          * @todo find a better way?
          */
@@ -105,7 +105,7 @@ export function useMotions(
 
     R.useLayoutEffect(() => {
         if (songPosition > 0) return
-        currentChunk.current = [0, analysis[type][0]]
+        cChunk.current = [0, analysis[type][0]]
     }, [trackChanged])
 
     F.useFrame((state) => {
@@ -113,65 +113,68 @@ export function useMotions(
         // console.log({ curr: currentChunk.current })
         // console.log({ songPosition })
         // console.log({ motion: inMotion.current })
-        if (!(position.current > 0) || !songPlaying) {
+        if (!(pos.current > 0) || !songPlaying) {
             return
         }
 
-        let [, cChunk] = currentChunk.current
-        if (!cChunk /** was last chunk */) {
+        let [, chunk] = cChunk.current
+        if (!chunk /** was last chunk */) {
             onUpdateCallback({
-                chunk: cChunk,
+                chunk,
                 state,
-                current: currentChunk.current,
+                current: cChunk.current,
                 event: 'ended',
             })
         }
-        if (!cChunk /** was last chunk */) return
+        if (!chunk /** was last chunk */) return
 
-        let cEnd = cChunk.start + cChunk.duration
-        let cDelta = cChunk.duration / 5 /** can be whatever */
+        let chunkEnd = chunk.start + chunk.duration
+        let slice = chunk.duration / 5 /** can be whatever */
 
         if (!inMotion.current) {
-            if (
-                position.current > cChunk.start &&
-                position.current < cEnd
-            ) {
+            if (pos.current > chunk.start && pos.current < chunkEnd) {
                 inMotion.current = true
-                log(
-                    `${type} - ${currentChunk.current[0]}`,
-                    styles[currentChunk.current[0] % 3]
-                )
-
-                enterCallback({ chunk: cChunk, state, current: currentChunk.current })
+                logChunk(type, cChunk)
+                enterCallback({ chunk: chunk, state, current: cChunk.current })
             }
         } else {
-            const threshold = cEnd - 2 * cDelta
-            if (position.current > threshold) {
-                const index = currentChunkIndex({
-                    songPosition: position.current,
+            const threshold = chunkEnd - 2 * slice
+            if (pos.current > threshold) {
+                const idx = getChunkIdx({
+                    songPosition: pos.current,
                     type,
                 })
-                currentChunk.current = [index + 1, analysis[type][index + 1]]
+                cChunk.current = [idx + 1, analysis[type][idx + 1]]
                 beforeLeaveCallback({
-                    next: index + 1,
-                    chunk: cChunk,
+                    next: idx + 1,
+                    chunk,
                     state,
-                    current: currentChunk.current,
+                    current: cChunk.current,
                 })
                 inMotion.current = false
             }
         }
 
         onUpdateCallback({
-            chunk: cChunk,
+            chunk: chunk,
             state,
-            current: currentChunk.current,
+            current: cChunk.current,
             event: inMotion.current ? 'entering' : 'leaving',
         })
     })
 }
 
-function currentChunkIndex({
+function logChunk(
+    type: string,
+    currentChunk: R.MutableRefObject<[number, Beat | Section]>
+) {
+    log(
+        `${type} - ${currentChunk.current[0]}`,
+        styles[currentChunk.current[0] % 3]
+    )
+}
+
+function getChunkIdx({
     songPosition,
     type,
 }: {
