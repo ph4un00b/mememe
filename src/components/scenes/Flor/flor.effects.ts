@@ -69,16 +69,8 @@ export function useSceneMotions(
     const currentSection = R.useRef(0)
 
     F.useFrame(({ clock }) => {
-        // camera.position.z = Math.cos(
-        //     // despues incrementar a 1
-        //     camera.position.z + clock.elapsedTime * +2
-        // )
-        // camera.position.y = Math.sin(
-        //     // 1. incrementar a 1
-        //     camera.position.x + clock.elapsedTime * -2
-        // )
         // [0, 8] [8, 11] -> [1,9] [9, 12] -> [0.1, 2] [2, 0.1]
-        if (currentSection.current >= 2 && currentSection.current < 8) {
+        if (currentSection.current >= 0 && currentSection.current < 8) {
             // we can precalculate this below if needed
             const val = mapRange(
                 currentSection.current,
@@ -90,6 +82,7 @@ export function useSceneMotions(
             )
 
             camera.position.z = Math.cos(
+                // primera idea
                 // despues incrementar a 1
                 camera.position.z + clock.elapsedTime * +val
             )
@@ -161,6 +154,7 @@ export function useSceneMotions(
             }
         }
     )
+
     useMotions(
         { type: 'sections' },
         function beforeLeaveCallback({ next, current }) { },
