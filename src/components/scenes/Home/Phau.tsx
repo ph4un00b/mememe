@@ -11,7 +11,7 @@ let global = {
     font1: `${baseUrl}/typeface/press-start-2p.json`,
 }
 
-export function Phau() {
+export default function Phau() {
 
     return (
         <>
@@ -70,7 +70,6 @@ function Letra({ symbol, ...props }: { symbol: string } & F.MeshProps) {
     )
 }
 
-F.extend({ TextGeometry })
 
 declare global {
     namespace JSX {
@@ -79,3 +78,5 @@ declare global {
         }
     }
 }
+
+F.extend({ TextGeometry }) // -> now you can do <aguaMat ... />

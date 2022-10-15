@@ -3,7 +3,7 @@ import * as T from 'three'
 import * as F from '@react-three/fiber'
 import * as D from '@react-three/drei'
 
-export function Fondo() {
+export default function Fondo() {
     const shader = R.useRef<ShaderProps>(null)
 
     F.useFrame((state) => {

@@ -2,8 +2,8 @@ import dynamic from 'next/dynamic'
 
 // Step 5 - delete Instructions components
 // import Instructions from '@/components/dom/Instructions'
-import { Fondo } from '@/components/scenes/Home/Fondo'
-import { Phau } from '@/components/scenes/Home/Phau'
+// import { Fondo } from '@/components/scenes/Home/Fondo'
+// import { Phau } from '@/components/scenes/Home/Phau'
 import * as meta from '@/config'
 // import Shader from '@/components/canvas/Shader/Shader'
 
@@ -23,16 +23,17 @@ I think it should be better to let the developer choose and go back to static im
 What do you guys think?
  */
 
-const Shader = dynamic(() => import('@/components/canvas/Shader/Shader'), {
+// const Shader = dynamic(() => import('@/components/canvas/Shader/Shader'), {
+//   ssr: false,
+// })
+
+const Fondo = dynamic(() => import('@/components/scenes/Home/Fondo'), {
   ssr: false,
 })
 
-// const Fondo = dynamic(() => import('@/components/pages/Home/Fondo'), {
-//   ssr: false,
-// })
-// const Phau = dynamic(() => import('@/components/pages/Home/Phau'), {
-//   ssr: false,
-// })
+const Phau = dynamic(() => import('@/components/scenes/Home/Phau'), {
+  ssr: false,
+})
 
 // dom components goes here
 const Page = (props) => {
@@ -51,7 +52,7 @@ Page.r3f = (props) => (
     <Phau />
     {/* <Shader /> */}
     <Fondo />
-    <axesHelper scale={4} />
+    {/* <axesHelper scale={4} /> */}
   </>
 )
 
