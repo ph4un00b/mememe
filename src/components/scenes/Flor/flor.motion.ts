@@ -67,8 +67,35 @@ export function useMotions(
     const [trackChanged] = useMediaPlayer()
     let currentChunk = R.useRef<[number, Beat | Section]>([0, analysis[type][0]])
 
+    const prevTime = R.useRef(0)
+    const prevPosition = R.useRef(0)
+    const position = R.useRef(0)
+
+    /**
+     * simplest solution in my mind at the moment
+     * to have high rate timing for animations,
+     * i might found something better afterwards,
+     * this seems to be issuing more than needed
+     * i might refactor this out of this context
+     * in order to run it once
+     * and *respect the clock!* (magnolia ref) XP
+     */
+    F.useFrame((state) => {
+        if (!(songPosition > 0) || !songPlaying) return
+        if (prevPosition.current == songPosition) {
+            const delta = state.clock.elapsedTime - prevTime.current
+            position.current += delta
+        }
+        prevPosition.current = songPosition
+        // todo: research if i can get a better delta
+        prevTime.current = state.clock.elapsedTime
+    })
+
     R.useEffect(() => {
-        const index = currentChunkIndex({ songPosition, type })
+        const index = currentChunkIndex({
+            songPosition: position.current,
+            type,
+        })
         currentChunk.current = [index, analysis[type][index]]
         /** the intention is to force enterCallback
          * @todo find a better way?
@@ -82,10 +109,11 @@ export function useMotions(
     }, [trackChanged])
 
     F.useFrame((state) => {
+        // if (type != 'beats') return
         // console.log({ curr: currentChunk.current })
         // console.log({ songPosition })
         // console.log({ motion: inMotion.current })
-        if (!(songPosition > 0) || !songPlaying) {
+        if (!(position.current > 0) || !songPlaying) {
             return
         }
 
@@ -104,7 +132,10 @@ export function useMotions(
         let cDelta = cChunk.duration / 5 /** can be whatever */
 
         if (!inMotion.current) {
-            if (songPosition > cChunk.start && songPosition < cEnd) {
+            if (
+                position.current > cChunk.start &&
+                position.current < cEnd
+            ) {
                 inMotion.current = true
                 log(
                     `${type} - ${currentChunk.current[0]}`,
@@ -115,8 +146,11 @@ export function useMotions(
             }
         } else {
             const threshold = cEnd - 2 * cDelta
-            if (songPosition > threshold) {
-                const index = currentChunkIndex({ songPosition, type })
+            if (position.current > threshold) {
+                const index = currentChunkIndex({
+                    songPosition: position.current,
+                    type,
+                })
                 currentChunk.current = [index + 1, analysis[type][index + 1]]
                 beforeLeaveCallback({
                     next: index + 1,
