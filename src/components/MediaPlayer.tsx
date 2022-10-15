@@ -1,4 +1,9 @@
-import { useAudioStatus, useMediaPlayer, useSongPosition } from '@/helpers/store'
+/* eslint-disable no-console */
+import {
+    useAudioStatus,
+    useMediaPlayer,
+    useSongPosition,
+} from '@/helpers/store'
 import {
     MediaControlBar,
     MediaController,
@@ -20,32 +25,31 @@ export const MediaPlayerMemo = R.memo(MediaPlayer)
 function MediaPlayer() {
     // console.log('rr?')
     /*
-                   * maybe ping mux? as showcase?
-                  /*
-                   * maybe ping r3f? as showcase?
-                   */
+                       * maybe ping mux? as showcase?
+                      /*
+                       * maybe ping r3f? as showcase?
+                       */
     const [trackChanged] = useMediaPlayer()
-    const started = R.useRef(false)
     const [, setSongPosition] = useSongPosition()
     const [, setPlaying] = useAudioStatus()
     const [ended, setEnd] = R.useState(false)
     const sound = R.useRef<HTMLAudioElement>(null!)
 
     R.useEffect(() => {
-        X.log.debug(' 🎼', { sopa: 'changed track', track: trackChanged })
         if (sound.current) {
-            sound.current.pause();
-            sound.current.load();
-            // this line below might not work on mobile devices
+            sound.current.pause()
+            sound.current.load()
+            // this line below might not work for mobile devices
             // do not use!
             // sound.current.play();
             // todo: do not use a magic number
             setSongPosition(-1)
+            X.log.debug(' 🎼', { sopa: 'changed track', track: trackChanged })
         } else {
             X.log.error('🌸', {
                 sopa: '📛 no sound',
                 track: trackChanged,
-                agent: window.navigator.userAgent
+                agent: window.navigator.userAgent,
             })
         }
     }, [trackChanged])
@@ -56,7 +60,7 @@ function MediaPlayer() {
                 sopa: '📛 something went wrong',
                 track: trackChanged,
                 agent: window.navigator.userAgent,
-                e
+                e,
             })
         },
         onended: () => {
@@ -66,12 +70,10 @@ function MediaPlayer() {
             setPlaying(false)
         },
         onpause: () => {
-            started.current = false
             X.log.debug('🌸', { sopa: 'pause musique 🎼' })
             setPlaying(false)
         },
         onplay: () => {
-            started.current = true
             X.log.debug('🌸', { sopa: 'play musique 🎼' })
             setPlaying(true)
         },
@@ -101,9 +103,9 @@ function MediaPlayer() {
                 </audio>
                 {/* {children} */}
                 {/* <audio
-                                                  slot='media'
-                                                  src='https://stream.mux.com/O4h5z00885HEucNNa1rV02wZapcGp01FXXoJd35AHmGX7g/audio.m4a'
-                                              /> */}
+                                                            slot='media'
+                                                            src='https://stream.mux.com/O4h5z00885HEucNNa1rV02wZapcGp01FXXoJd35AHmGX7g/audio.m4a'
+                                                        /> */}
                 <MediaControlBar>
                     {/* <MediaLoadingIndicator /> */}
                     {/* @link https://media-chrome-docs.vercel.app/en/keyboard-shortcuts
