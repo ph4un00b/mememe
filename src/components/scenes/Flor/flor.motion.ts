@@ -3,6 +3,7 @@ import * as R from 'react'
 import * as F from '@react-three/fiber'
 import {
     useAudioStatus,
+    useMediaPlayer,
     useSeekPosition,
     useSongPosition,
 } from '@/helpers/store'
@@ -64,6 +65,7 @@ export function useMotions(
     const [seekedPosition] = useSeekPosition()
     const [songPlaying] = useAudioStatus()
     const [songPosition] = useSongPosition()
+    const [trackChanged] = useMediaPlayer()
     let currentChunk = R.useRef<[number, Beat | Section]>([0, analysis[type][0]])
 
     R.useEffect(() => {
@@ -75,14 +77,20 @@ export function useMotions(
         // inMotion.current = false
     }, [seekedPosition])
 
+    R.useLayoutEffect(() => {
+        if (songPosition > 0) return
+        currentChunk.current = [0, analysis[type][0]]
+    }, [trackChanged])
+
     F.useFrame((state) => {
+        // console.log({ curr: currentChunk.current })
         // console.log({ songPosition })
         // console.log({ motion: inMotion.current })
         if (!(songPosition > 0) || !songPlaying) {
             return
         }
+
         let [, cChunk] = currentChunk.current
-        // console.log(cChunk)
         if (!cChunk /** was last chunk */) {
             onUpdateCallback({
                 chunk: cChunk,
