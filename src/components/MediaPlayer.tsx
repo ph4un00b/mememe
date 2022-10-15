@@ -24,7 +24,7 @@ function MediaPlayer() {
                   /*
                    * maybe ping r3f? as showcase?
                    */
-    const [currentTrack] = useMediaPlayer()
+    const [trackChanged] = useMediaPlayer()
     const started = R.useRef(false)
     const [, setSongPosition] = useSongPosition()
     const [, setPlaying] = useAudioStatus()
@@ -32,21 +32,29 @@ function MediaPlayer() {
     const sound = R.useRef<HTMLAudioElement>(null!)
 
     R.useEffect(() => {
-        X.log.debug(' 🎼', { sopa: 'changed track', track: currentTrack })
+        X.log.debug(' 🎼', { sopa: 'changed track', track: trackChanged })
         if (sound.current) {
             sound.current.pause();
             sound.current.load();
             // this line below might not work on mobile devices
             // do not use!
             // sound.current.play();
+            // todo: do not use a magic number
+            setSongPosition(-1)
+        } else {
+            X.log.error('🌸', {
+                sopa: '📛 no sound',
+                track: trackChanged,
+                agent: window.navigator.userAgent
+            })
         }
-    }, [currentTrack])
+    }, [trackChanged])
 
     useAudioHooks(sound, {
         onerror: (e) => {
             X.log.error('🌸', {
                 sopa: '📛 something went wrong',
-                track: currentTrack,
+                track: trackChanged,
                 agent: window.navigator.userAgent,
                 e
             })
@@ -87,7 +95,7 @@ function MediaPlayer() {
                 <audio slot='media' ref={sound} loop={false} preload='auto'>
                     <source
                         // todo: this might be extra stuff, since we use a audio ref
-                        src={currentTrack}
+                        src={trackChanged}
                         type='audio/mpeg'
                     />
                 </audio>

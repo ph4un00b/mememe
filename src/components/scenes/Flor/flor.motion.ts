@@ -76,11 +76,13 @@ export function useMotions(
     }, [seekedPosition])
 
     F.useFrame((state) => {
-        // console.log({ songPlaying, songPosition })
+        // console.log({ songPosition })
+        // console.log({ motion: inMotion.current })
         if (!(songPosition > 0) || !songPlaying) {
             return
         }
         let [, cChunk] = currentChunk.current
+        // console.log(cChunk)
         if (!cChunk /** was last chunk */) {
             onUpdateCallback({
                 chunk: cChunk,

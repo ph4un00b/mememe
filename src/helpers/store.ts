@@ -82,7 +82,7 @@ const useStoreImpl = create<MyGlobalState>((set) => {
         debugParticles: val,
       }))
     },
-    songPosition: 0,
+    songPosition: -1,
     changeSongPosition: (val) => {
       set((prev) => {
         // console.log(`prev`, prev)
