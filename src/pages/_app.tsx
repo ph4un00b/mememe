@@ -2,7 +2,6 @@ import Header from '@/config'
 import Dom from '@/components/layout/dom'
 import '@/styles/index.css'
 import dynamic from 'next/dynamic'
-import { AudioPlayerProvider } from 'react-use-audio-player'
 import { GrowthBook, GrowthBookProvider } from '@growthbook/growthbook-react'
 import * as R from 'react'
 import { log } from 'next-axiom'
@@ -49,20 +48,17 @@ function App({ Component, router, pageProps = { title: 'index' } }) {
     <>
       <Header title={pageProps.title} />
       {/* //todo: remove completamente! */}
-      <AudioPlayerProvider>
-        <Dom>
-          <GrowthBookProvider growthbook={growthbook}>
-            <Component {...pageProps} />
-          </GrowthBookProvider>
-        </Dom>
+      <Dom>
+        <GrowthBookProvider growthbook={growthbook}>
+          <Component {...pageProps} />
+        </GrowthBookProvider>
+      </Dom>
 
 
-        {Component?.r3f && <LCanvas>{Component.r3f(pageProps)}</LCanvas>}
-      </AudioPlayerProvider>
+      {Component?.r3f && <LCanvas>{Component.r3f(pageProps)}</LCanvas>}
     </>
   )
 }
 
-export { reportWebVitals } from 'next-axiom'
 export default App
 

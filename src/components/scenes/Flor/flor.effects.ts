@@ -2,7 +2,6 @@ import * as R from 'react'
 import * as T from 'three'
 import * as F from '@react-three/fiber'
 import { useDebugBeats, useDebugParticles } from '@/helpers/store'
-import { useAudioPosition } from 'react-use-audio-player'
 import { useMotions } from './flor.motion'
 
 export function useSceneMotions(
@@ -31,10 +30,6 @@ export function useSceneMotions(
     const [, changeDebugParticles] = useDebugParticles()
 
     const { camera } = F.useThree()
-
-    const { position, percentComplete } = useAudioPosition({
-        highRefreshRate: true,
-    })
 
     F.useFrame(({ clock }) => {
         const time = clock.getElapsedTime()

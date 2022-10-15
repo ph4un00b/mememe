@@ -7,7 +7,6 @@ import {
     useSeekPosition,
     useSongPosition,
 } from '@/helpers/store'
-import { useAudioPlayer, useAudioPosition } from 'react-use-audio-player'
 import florecerData from '../../../music/florecer.json'
 import clone from 'lodash.clone'
 import * as X from 'next-axiom'
