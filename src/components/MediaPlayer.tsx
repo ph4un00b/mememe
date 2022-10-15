@@ -21,7 +21,8 @@ import * as R from 'react'
 import * as X from 'next-axiom'
 import * as hooks from '@/utils/hooks'
 
-export const MediaPlayerMemo = R.memo(MediaPlayer)
+const MediaPlayerMemo = R.memo(MediaPlayer)
+export default MediaPlayerMemo
 function MediaPlayer() {
     // console.log('rr?')
     /*

@@ -3,9 +3,13 @@ import {
   useGlobalColors,
   usePlayerPortals,
 } from '@/helpers/store'
+import dynamic from 'next/dynamic'
 
 import * as R from 'react'
-import { MediaPlayerMemo } from '../MediaPlayer'
+// import MediaPlayerMemo from '../MediaPlayer'
+const MediaPlayerMemo = dynamic(() => import('@/components/MediaPlayer'), {
+  ssr: true,
+})
 
 const Dom = ({ children }) => {
   const ref = R.useRef<HTMLDivElement | null>(null)
