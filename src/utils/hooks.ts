@@ -1,4 +1,4 @@
-import * as R from 'react'
+import * as R from "react";
 
 /** @link https://overreacted.io/making-setinterval-declarative-with-react-hooks/ */
 export function useInterval(callback: () => void, delay: number) {
@@ -36,7 +36,7 @@ export function useTimeout(callback: () => void, delay: number) {
 }
 
 /** @link https://usehooks.com/useEventListener/ */
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useEventListener(eventName, handler, element = window) {
     // Create a ref that stores handler
@@ -67,11 +67,12 @@ export function useEventListener(eventName, handler, element = window) {
                 element.removeEventListener(eventName, eventListener);
             };
         },
-        [eventName, element] // Re-run if eventName or element changes
+        [eventName, element], // Re-run if eventName or element changes
     );
 }
 
 export function useAudioListener(eventName, handler, audio) {
+    const audioRef = audio.current;
     // Create a ref that stores handler
     const savedHandler = useRef(null);
     // Update ref.current value if handler changes.
@@ -87,12 +88,12 @@ export function useAudioListener(eventName, handler, audio) {
             // Create event listener that calls handler function stored in ref
             const eventListener = (event) => savedHandler.current(event);
             // Add event listener
-            audio.current.addEventListener(eventName, eventListener);
+            audioRef.addEventListener(eventName, eventListener);
             // Remove event listener on cleanup
             return () => {
-                audio.current.removeEventListener(eventName, eventListener);
+                audioRef.removeEventListener(eventName, eventListener);
             };
         },
-        [eventName, audio.current] // Re-run if eventName or element changes
+        [eventName, audioRef], // Re-run if eventName or element changes
     );
 }
