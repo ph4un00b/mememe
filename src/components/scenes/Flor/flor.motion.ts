@@ -193,6 +193,10 @@ function getChunkIdx({
     }
 }
 
+/**
+ * @link https://transform.tools/json-to-typescript
+ */
+
 export interface MusicAnalysis {
     meta: Meta
     track: Track
