@@ -2,6 +2,7 @@ import * as R from 'react'
 import * as T from 'three'
 import * as F from '@react-three/fiber'
 import * as D from '@react-three/drei'
+import { ShaderProps } from '../declarations'
 
 export default function Fondo() {
     const shader = R.useRef<ShaderProps>(null)
@@ -115,16 +116,7 @@ const frag = glsl`
   }
 `
 
-type ShaderProps = T.ShaderMaterial & {
-    [key: string]: any
-}
-
-declare module '@react-three/fiber' {
-    interface ThreeElements {
-        aguaMat: F.Object3DNode<ShaderProps, typeof AguaMat>
-    }
-}
-
-const AguaMat = D.shaderMaterial({ utime: 0 }, vertex, frag)
+export const AguaMat = D.shaderMaterial({ utime: 0 }, vertex, frag)
 
 F.extend({ AguaMat }) // -> now you can do <aguaMat ... />
+

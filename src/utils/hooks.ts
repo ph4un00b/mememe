@@ -40,16 +40,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useEventListener(eventName, handler, element = window) {
     // Create a ref that stores handler
-    const savedHandler = useRef(null);
+    const savedHandler = R.useRef(null);
     // Update ref.current value if handler changes.
     // This allows our effect below to always get latest handler ...
     // ... without us needing to pass it in effect deps array ...
     // ... and potentially cause effect to re-run every render.
-    useEffect(() => {
+    R.useEffect(() => {
         savedHandler.current = handler;
     }, [handler]);
 
-    useEffect(
+    R.useEffect(
         () => {
             // Make sure element supports addEventListener
             // On
@@ -72,19 +72,20 @@ export function useEventListener(eventName, handler, element = window) {
 }
 
 export function useAudioListener(eventName, handler, audio) {
-    const audioRef = audio.current;
     // Create a ref that stores handler
-    const savedHandler = useRef(null);
+    const savedHandler = R.useRef(null);
     // Update ref.current value if handler changes.
     // This allows our effect below to always get latest handler ...
     // ... without us needing to pass it in effect deps array ...
     // ... and potentially cause effect to re-run every render.
-    useEffect(() => {
+    R.useEffect(() => {
         savedHandler.current = handler;
     }, [handler]);
 
-    useEffect(
+    R.useEffect(
         () => {
+            if (!audio.current) return
+            const audioRef = audio.current;
             // Create event listener that calls handler function stored in ref
             const eventListener = (event) => savedHandler.current(event);
             // Add event listener
@@ -94,6 +95,6 @@ export function useAudioListener(eventName, handler, audio) {
                 audioRef.removeEventListener(eventName, eventListener);
             };
         },
-        [eventName, audioRef], // Re-run if eventName or element changes
+        [eventName, audio]
     );
 }
