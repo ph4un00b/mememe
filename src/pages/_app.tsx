@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import { GrowthBook, GrowthBookProvider } from '@growthbook/growthbook-react'
 import * as R from 'react'
 import { log } from 'next-axiom'
+import useSWR from 'swr'
 
 const LCanvas = dynamic(() => import('@/components/layout/canvas'), {
   ssr: true,
@@ -19,45 +20,48 @@ const growthbook = new GrowthBook({
   },
 })
 
+async function fetcher(url: string) {
+  const response = await window.fetch(url);
+  const json = await response.json();
+  growthbook.setFeatures(json.features);
+  return { status: 'ok' } as const;
+}
+
+
 function App({ Component, router, pageProps = { title: 'index' } }) {
-  // Refresh features and targeting attributes on navigation
-  R.useEffect(() => {
-    fetch(FEATURES_ENDPOINT)
-      .then((res) => res.json())
-      .then((json) => {
-        growthbook.setFeatures(json.features)
-      })
-      .catch(() => {
-        log.error('🧪 Failed to fetch feature definitions from GrowthBook')
-      })
+  const { data, error, isLoading } = useSWR(FEATURES_ENDPOINT, fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  })
 
-    growthbook.setAttributes({
-      id: 'foo',
-      deviceId: 'foo',
-      company: 'foo',
-      loggedIn: true,
-      employee: true,
-      test: true,
-      country: 'foo',
-      browser: window.navigator.userAgent,
-      url: router.pathname,
-    })
-  }, [router.pathname])
-
-  return (
-    <>
-      <Header title={pageProps.title} />
-      {/* //todo: remove completamente! */}
-      <Dom>
-        <GrowthBookProvider growthbook={growthbook}>
+  if (error) {
+    log.error('🧪 Failed to fetch feature definitions from GrowthBook')
+    return (
+      <>
+        <Header title={pageProps.title} />
+        <Dom>
           <Component {...pageProps} />
-        </GrowthBookProvider>
-      </Dom>
+        </Dom>
+        {Component?.r3f && <LCanvas>{Component.r3f(pageProps)}</LCanvas>}
+      </>
+    )
+  }
 
+  if (isLoading) return 'Loading...'
 
-      {Component?.r3f && <LCanvas>{Component.r3f(pageProps)}</LCanvas>}
-    </>
-  )
+  if (data.status === 'ok')
+    return (
+      <>
+        <Header title={pageProps.title} />
+        <Dom>
+          <GrowthBookProvider growthbook={growthbook}>
+            <Component {...pageProps} />
+          </GrowthBookProvider>
+        </Dom>
+        {Component?.r3f && <LCanvas>{Component.r3f(pageProps)}</LCanvas>}
+      </>
+    )
 }
 
 export default App
