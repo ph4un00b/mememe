@@ -53,7 +53,7 @@ export function useMotions(
         /** mostly ios fallback */
         X.log.error('🌸', {
             sopa: '📛falling from structuredClone',
-            agent: window.navigator.userAgent,
+            agent: global.navigator.userAgent,
         })
         return clone(florecerData) as MusicAnalysis
     }, [])

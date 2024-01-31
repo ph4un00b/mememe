@@ -6,6 +6,7 @@ import { GrowthBook, GrowthBookProvider } from '@growthbook/growthbook-react'
 import * as R from 'react'
 import { log } from 'next-axiom'
 import useSWR from 'swr'
+import { match, P } from 'ts-pattern'
 
 const LCanvas = dynamic(() => import('@/components/layout/canvas'), {
   ssr: true,
@@ -29,7 +30,8 @@ async function fetcher(url: string) {
 
 
 function App({ Component, router, pageProps = { title: 'index' } }) {
-  const { data, error, isLoading } = useSWR(FEATURES_ENDPOINT, fetcher, {
+  // * @see https://swr.vercel.app/docs/revalidation#disable-automatic-revalidations
+  const { data, error } = useSWR(FEATURES_ENDPOINT, fetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
@@ -37,31 +39,27 @@ function App({ Component, router, pageProps = { title: 'index' } }) {
 
   if (error) {
     log.error('🧪 Failed to fetch feature definitions from GrowthBook')
-    return (
-      <>
-        <Header title={pageProps.title} />
-        <Dom>
-          <Component {...pageProps} />
-        </Dom>
-        {Component?.r3f && <LCanvas>{Component.r3f(pageProps)}</LCanvas>}
-      </>
-    )
   }
 
-  if (isLoading) return 'Loading...'
-
-  if (data.status === 'ok')
-    return (
-      <>
-        <Header title={pageProps.title} />
-        <Dom>
-          <GrowthBookProvider growthbook={growthbook}>
-            <Component {...pageProps} />
-          </GrowthBookProvider>
-        </Dom>
-        {Component?.r3f && <LCanvas>{Component.r3f(pageProps)}</LCanvas>}
-      </>
-    )
+  return (
+    <>
+      <Header title={pageProps.title} />
+      <Dom>
+        {match(data)
+          .with({ status: 'ok' }, () => {
+            return (
+              <GrowthBookProvider growthbook={growthbook}>
+                <Component {...pageProps} />
+              </GrowthBookProvider>
+            )
+          })
+          .otherwise(() => {
+            return <Component {...pageProps} />
+          })}
+      </Dom>
+      {Component?.r3f && <LCanvas>{Component.r3f(pageProps)}</LCanvas>}
+    </>
+  )
 }
 
 export default App
