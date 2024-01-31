@@ -39,8 +39,9 @@ const LCanvas = ({ children }) => {
       <LControl />
       <Preload all />
       {children}
-      <Stats />
-      <Perf />
+      {/*? below lines toggle the debug components ❗*/}
+      {/*<Stats />*/}
+      {/*<Perf />*/}
     </Canvas>
   )
 }
