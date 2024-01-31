@@ -3,6 +3,9 @@
 
 Crafted purely for the joy of experimentation and fun, a bit of shaders, a bit of creativity mixed and matched with react and friends.
 
+# meaning
+a narrative of primitive life gradually evolving over time. 
+
 # interactions
 - you can change the animation color
 - you can touch the animation try to move it around ❗
