@@ -3,6 +3,10 @@
 
 Crafted purely for the joy of experimentation and fun, a bit of shaders, a bit of creativity mixed and matched with react and friends.
 
+# interactions
+- you can change the animation color
+- you can touch the animation try to move it around ❗
+
 # 🚀 goals
  it's sad to come across exciting projects that are exclusively desktop-oriented. This project is dedicated to ensuring an enjoyable experience on mobile devices.
 
